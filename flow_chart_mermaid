@@ -1,0 +1,24 @@
+flowchart TD
+
+    A{data.tak} -->|organized| B{video}
+    A --> F{raw_c3d}
+    B--> H[extrinsic.avi]
+    F --> J[extrinsics.c3d]
+
+    B --> |Formatted| C{video_rotated}
+    C -->|Pose2d : Pose detection via mmpose| D{data.hdf5}
+    D --> |Pose3d :triangulation using Pose2Sim via creating a fake folder|E[c3d from markerless]
+
+
+    B --> K[fichier rot]
+
+    J --> I[calibration sans rotation]
+    H --> I
+    K --> L[calib_rotation]
+    I --> L
+    L --> D
+    F --> |Labeling| G[labelled c3d]
+    G <--> |Comparaison 3D| E
+    L --> 3D_2D[3D_to_2D projection of the 3D data on video]
+    G --> 3D_2D
+    3D_2D <--> |Comparaison 2D| D

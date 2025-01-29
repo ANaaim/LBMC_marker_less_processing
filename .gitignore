@@ -1,0 +1,14 @@
+
+#Folder
+LBMC_marker_less/
+ISB_Analysis/
+data_montreal/
+.idea/
+__pycache__/
+
+# Type of file
+*.log
+*.h5
+*.png
+*.svg
+toto*
