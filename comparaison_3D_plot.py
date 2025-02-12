@@ -12,12 +12,12 @@ dict_mean_std = snipH5.load_dictionary_from_hdf( folder_data/"mean_std_3d.h5")
 dict_final_percentage = snipH5.load_dictionary_from_hdf(folder_data / "comparaison_percentage_3d.h5")
 
 camera_configurations = list(dict_mean_std.keys())
-camera_configurations = ["ABCDE"]
+
 list_model = list(dict_mean_std[camera_configurations[0]].keys())
 key_points = list(dict_mean_std[camera_configurations[0]][list_model[0]].keys())
 
 value_to_plot_list = ["X", "Y", "Z","norm"]
-
+value_to_plot_list = ["norm"]
 info = combinaison_camera.generate()
 for value_to_plot in value_to_plot_list:
     # plot box plot for each model and joint
@@ -68,12 +68,14 @@ for value_to_plot in value_to_plot_list:
         # Create DataFrames
         df = pd.DataFrame(data, columns=['name_config', 'Model', 'Joint', 'nb_camera', 'Value'])
         df_percentage = pd.DataFrame(percentage_data, columns=['name_config', 'Model', 'Joint', 'nb_camera', 'Percentage'])
+        # Assuming nb_camera is consistent for each 'name_config'
+        desired_order = df.groupby('name_config')['nb_camera'].first().sort_values().index.tolist()
 
         # Plot the data
         fig, ax1 = plt.subplots(figsize=(15, 10))
 
         # Box plot
-        sns.boxplot(x='name_config', y='Value', hue='nb_camera', data=df, showfliers=plot_outliers, ax=ax1)
+        sns.boxplot(x='name_config', y='Value', hue='nb_camera', data=df, showfliers=plot_outliers, order=desired_order, ax=ax1)
         ax1.set_xlabel('Camera configuration')
         ax1.set_ylabel('Value (mm)')
         ax1.set_title(f'Distribution {value_to_plot} of error and percentage of non reconstructed values for {points}')
