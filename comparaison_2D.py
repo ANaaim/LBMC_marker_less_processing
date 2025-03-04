@@ -101,6 +101,7 @@ def comparaison_two_data_set(path_to_mmpose_data,path_to_ref):
             nb_frame_model_data = model_data[camera][new_dict[key]].shape[0]
             # use the min value of the two
             min_nb_frame = min(nb_frame_ref, nb_frame_model_data)
+
             dict_comp[camera][key] = np.linalg.norm(model_ref[camera][key][:min_nb_frame, 0:2] - model_data[camera][new_dict[key]][
                                                                                 :min_nb_frame, 0:2],axis=1)
         # specific comp
@@ -120,18 +121,28 @@ def comparaison_two_data_set(path_to_mmpose_data,path_to_ref):
 if __name__ == "__main__":
     path_to_data_labelled = Path("E:/Argos/Processing/C3D_labelled")
     path_to_pose2d = Path("E:/Argos/Processing/Pose2d")
-
+    path_to_export = Path("./Comparaison_2D")
     # Generate 3d_to_2d hdf5 ------------------------------------------------
 
-    subjects_names = ["Sujet_007", "Sujet_000"]#, "Sujet_001", "Sujet_002", "Sujet_003"]
+    subjects_names = ["Sujet_000", "Sujet_001", "Sujet_002", "Sujet_003", "Sujet_004", "Sujet_005", "Sujet_006", "Sujet_007"]
     #task_to_process = ["16-comb-hair.c3d"]
+    # TODO : retrained all model sujet_005 17-hand-to-back_001
     sujet_to_list_task = {
         "Sujet_000": ["01-eat-yaourt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
         "Sujet_001": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
         "Sujet_002": ["01-eat-yoghurt", "02-cut-food", "13-playdoe_001", "06-drawing", "16-comb-hair","17-hand-to-back"],
         "Sujet_003": ["01-eat-yoghurt", "02-cut-food", "13-playdoe_002", "06-drawing", "16-comb-hair","17-hand-to-back"],
+        "Sujet_004": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair","17-hand-to-back"],
+        "Sujet_005": ["01-eat-yoghurt_001", "02-cut-food", "13-playdoe", "06-drawing_001", "16-comb-hair"],# "17-hand-to-back_001"],
+        "Sujet_006": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
         "Sujet_007": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair","17-hand-to-back"]}
 
+    # sujet_to_list_task = {
+    #     "Sujet_000": ["06-drawing"],
+    #     "Sujet_001": ["06-drawing"],
+    #     "Sujet_002": ["06-drawing"],
+    #     "Sujet_003": ["06-drawing"],
+    #     "Sujet_007": ["06-drawing"]}
     generate_3d_to_2d_hdf5(path_to_data_labelled, subjects_names, sujet_to_list_task)
 
     # Comparaison with data form mmpose ------------------------------------------------
@@ -173,13 +184,14 @@ if __name__ == "__main__":
                 dict_level_task[task] = comparaison_two_data_set(path_to_mmpose_data,path_to_ref)
             dict_level_subject[subject] = dict_level_task
         dict_lvl_model[model] = dict_level_subject
-    snipH5.save_dictionary_to_hdf(dict_lvl_model, "comparaison.h5")
+
+    snipH5.save_dictionary_to_hdf(dict_lvl_model, path_to_export/ "comparaison.h5")
     # fusion of the data
     # Model->Camera->Points
 
     list_camera = dict_lvl_model[list_model[0]][subjects_names[0]][sujet_to_list_task[subjects_names[0]][0]].keys()
-    list_camera = [['M11141','M11458','M11463'],['M11139','M11459'],['M11140','M11461','M11462']]
-    name_camera = ["front","lateral","back"]
+    list_camera = [["M11463"],['M11141','M11458'],['M11139','M11459'],['M11140','M11461'],['M11462']]
+    name_camera = ["A","B","C","D","E"]
 
     list_points = [["L_SJC","R_SJC"],["L_EJC","R_EJC"],["L_WJC","R_WJC"],["L_HMJC","R_HMJC"]]
     key_points = ["SJC","EJC","WJC","HMJC"]
@@ -206,7 +218,7 @@ if __name__ == "__main__":
                                                                                               dict_lvl_model[model][subject][task][camera][point],axis=0)
 
     # save the dict_final
-    snipH5.save_dictionary_to_hdf(dict_final, "comparaison_final.h5")
+    snipH5.save_dictionary_to_hdf(dict_final,  path_to_export/ "comparaison_final.h5")
     # calculate the absolut mean and std of the data for each combinaison model, camera, points
     dict_mean_std = dict()
     for model in list_model:
@@ -217,7 +229,7 @@ if __name__ == "__main__":
                 dict_mean_std[model][camera][points] = [np.nanmean(np.abs(dict_final[model][camera][points]),axis=0),np.nanstd(np.abs(dict_final[model][camera][points]),axis=0)]
 
     # save the mean and std
-    snipH5.save_dictionary_to_hdf(dict_mean_std, "mean_std.h5")
+    snipH5.save_dictionary_to_hdf(dict_mean_std,  path_to_export/ "mean_std.h5")
     #snipH5.save_dictionary_to_hdf(dict_std, "std.h5")
     # Convert the dict_mean_std to a DataFrame
     # Convert the dict_mean_std to a DataFrame

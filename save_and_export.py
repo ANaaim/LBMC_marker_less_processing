@@ -4,6 +4,7 @@ import json
 import snip_h5py
 import random
 from collections import OrderedDict
+import math
 
 def result_to_json(data, name_camera, path_to_json,keypoints_to_process, param_correction, testing=False):
     """
@@ -60,8 +61,10 @@ def result_to_json(data, name_camera, path_to_json,keypoints_to_process, param_c
         with open(full_path, "w") as outfile:
             json.dump(mmpose_result, outfile)
 
+def contains_nan(lst):
+    return any(math.isnan(x) for x in lst)
 
-def result_to_annotation(data, name_camera, path_to_json, list_points):
+def result_to_annotation(data, name_camera, path_to_json, list_points, decimation):
     """
     A function to export the position of the point in images following the LIO training toolbox. This is used to format
     the coordinate of the point extracted from the reprojection of the 3D points measured on a 2D images for a camera
@@ -88,7 +91,8 @@ def result_to_annotation(data, name_camera, path_to_json, list_points):
     all_points_list = list(point_2D.keys())
     nb_frame = point_2D[list_points[0]].shape[0]
     annotation_result = dict()
-    for ind in range(nb_frame):
+    frame_to_process = range(0,nb_frame,decimation)
+    for ind_export, true_ind_frame in enumerate(frame_to_process):
         data_frame = dict()
         data_frame["subject_id"] = 1
         data_frame["trial_id"] = "toto"
@@ -100,29 +104,31 @@ def result_to_annotation(data, name_camera, path_to_json, list_points):
 
         list_coordinate = list()
         for name_point in all_points_list:
+
             if name_point in list_points:
-                list_coordinate.append(point_2D[name_point][ind, 0])
-                list_coordinate.append(point_2D[name_point][ind, 1])
-            if point_2D[name_point][ind, 0] < x_min:
-                x_min = point_2D[name_point][ind, 0]
-            if point_2D[name_point][ind, 1] < y_min:
-                y_min = point_2D[name_point][ind, 1]
-            if point_2D[name_point][ind, 0] > x_max:
-                x_max = point_2D[name_point][ind, 0]
-            if point_2D[name_point][ind, 1] > y_max:
-                y_max = point_2D[name_point][ind, 1]
+                list_coordinate.append(point_2D[name_point][true_ind_frame, 0])
+                list_coordinate.append(point_2D[name_point][true_ind_frame, 1])
+            if point_2D[name_point][true_ind_frame, 0] < x_min:
+                x_min = point_2D[name_point][true_ind_frame, 0]
+            if point_2D[name_point][true_ind_frame, 1] < y_min:
+                y_min = point_2D[name_point][true_ind_frame, 1]
+            if point_2D[name_point][true_ind_frame, 0] > x_max:
+                x_max = point_2D[name_point][true_ind_frame, 0]
+            if point_2D[name_point][true_ind_frame, 1] > y_max:
+                y_max = point_2D[name_point][true_ind_frame, 1]
         width = x_max - x_min
         height = y_max - y_min
 
         x_padding = random.uniform(0.05, 0.1)
         y_padding = random.uniform(0.05, 0.1)
 
-        factor = 1
-        x_min -= width * factor * x_padding
-        x_max += width * factor * x_padding
+        factor_x = 2
+        factor_y = 6
+        x_min -= width * factor_x * x_padding
+        x_max += width * factor_x * x_padding
 
-        y_min -= height * factor * y_padding
-        y_max += height * factor * y_padding
+        y_min -= height * factor_y * y_padding
+        y_max += height * factor_y * y_padding
 
         if x_max > 1080:
             x_max = 1080
@@ -133,10 +139,14 @@ def result_to_annotation(data, name_camera, path_to_json, list_points):
         if y_min < 0:
             y_min = 0
 
+        all_data_to_export = [x_min, y_min, x_max, y_max] + list_coordinate
+        if contains_nan(all_data_to_export):
+            continue
         data_frame["bbox"] = [x_min, y_min, x_max, y_max]
         data_frame["joints"] = list_coordinate
 
-        name_frame = f"{ind+1:09}"
+        name_frame = f"{ind_export+1:09}"
+
         annotation_result[name_frame] = data_frame
 
     # write the json file
@@ -182,7 +192,7 @@ def export_data_to_json(data_export, path_to_json, keypoints_to_process,param_co
                 result_to_json(data_export, camera_name, path_to_json,keypoints_to_process,param_correction, testing)
 
 
-def export_data_to_annotation(data_export, path_to_json, list_points):
+def export_data_to_annotation(data_export, path_to_json, list_points, decimation):
     """
     Batch processing for all video of result_to_json
 
@@ -200,7 +210,7 @@ def export_data_to_annotation(data_export, path_to_json, list_points):
     None
     """
     for camera_name in data_export:
-        result_to_annotation(data_export, camera_name, path_to_json, list_points)
+        result_to_annotation(data_export, camera_name, path_to_json, list_points, decimation)
 
 
 def save_hdf5(dict_for_hdf5, path_to_hdf5, filename):

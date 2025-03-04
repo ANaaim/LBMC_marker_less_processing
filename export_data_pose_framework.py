@@ -75,7 +75,7 @@ def extract_images_from_video_ffmpeg(video_path, output_folder, decimation):
 
 
 
-def main(path_global_c3d, path_global_video, path_export, list_task, fq_data, fq_data_export_video, generate_image=True):
+def main(path_global_c3d, path_global_video, path_export, list_points, list_task, fq_data, fq_data_export_video, generate_image=True):
     """ "
     Bacth processing to generate from a folder containing the c3d file and a file containing the video file a folder containing
     an annotation files and a file containing all the images contained in the video file.
@@ -88,6 +88,8 @@ def main(path_global_c3d, path_global_video, path_export, list_task, fq_data, fq
         the path to the video data organised as follow Path/subject/subject/task/videos/camera_name/camera_name.extension_video
     path_export : Path
         path to export the data
+    list_points : list
+        list of the point that should be exported in the annotation files
     list_task : dict
         dictionary containing the task for each subject
     fq_data : dict
@@ -153,7 +155,7 @@ def main(path_global_c3d, path_global_video, path_export, list_task, fq_data, fq
             path_to_annotation = Path(path_export, subject_name, task)
             # TODO : Change the number of point to export
             save_and_export.export_data_to_annotation(
-                data_to_export, path_to_annotation, ["IJ", "PX", "T10"], decimation
+                data_to_export, path_to_annotation, list_points, decimation
             )
 
             # extract images for each video
@@ -185,28 +187,33 @@ if __name__ == "__main__":
     fq_file_c3d = 120
     subject_to_fq_file_video = {"Sujet_000": [fq_file_c3d,120],"Sujet_001": [fq_file_c3d,60],
                                 "Sujet_002": [fq_file_c3d,60],"Sujet_003": [fq_file_c3d,60],
-                                "Sujet_007": [fq_file_c3d,60]}
+                                "Sujet_004": [fq_file_c3d, 60], "Sujet_005": [fq_file_c3d, 60],
+                                "Sujet_006": [fq_file_c3d, 60], "Sujet_007": [fq_file_c3d, 60],}
 
     sujet_to_list_task = {
         "Sujet_000": ["01-eat-yaourt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
         "Sujet_001": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
         "Sujet_002": ["01-eat-yoghurt", "02-cut-food", "13-playdoe_001", "06-drawing", "16-comb-hair","17-hand-to-back"],
         "Sujet_003": ["01-eat-yoghurt", "02-cut-food", "13-playdoe_002", "06-drawing", "16-comb-hair","17-hand-to-back"],
+        "Sujet_004": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair","17-hand-to-back"],
+        "Sujet_005": ["01-eat-yoghurt_001", "02-cut-food", "13-playdoe", "06-drawing_001", "16-comb-hair", "17-hand-to-back_001"],
+        "Sujet_006": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
         "Sujet_007": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair","17-hand-to-back"]}
 
-    sujet_to_list_task = {
-        "Sujet_001": ["01-eat-yoghurt"],
-        "Sujet_002": ["01-eat-yoghurt" ],
-        "Sujet_003": ["01-eat-yoghurt" ],
-        "Sujet_007": ["01-eat-yoghurt"]}
+    # sujet_to_list_task = {
+    #     "Sujet_000": ["01-eat-yaourt"],
+    #     "Sujet_001": ["01-eat-yoghurt"],
+    #     "Sujet_002": ["01-eat-yoghurt" ],
+    #     "Sujet_003": ["01-eat-yoghurt" ],
+    #     "Sujet_007": ["01-eat-yoghurt"]}
 
-
-
-    generate_image = True
+    list_points = ["IJ","PX","C7","T10","L_EL","L_EM","R_EM","R_EL","L_RS","L_US","R_RS","R_US"]
+    # TODO : Do a function to generate the description of data to use in the function
+    generate_image = False
     fq_to_export_video = 5
     # Final folder structure
     path_global_c3d = adress_folder.path_global_c3d()
     path_global_video = adress_folder.path_global_video()
     path_export = adress_folder.path_export_pose_framework()
 
-    main(path_global_c3d, path_global_video, path_export, sujet_to_list_task, subject_to_fq_file_video,fq_to_export_video, generate_image)
+    main(path_global_c3d, path_global_video, path_export,list_points, sujet_to_list_task, subject_to_fq_file_video,fq_to_export_video, generate_image)

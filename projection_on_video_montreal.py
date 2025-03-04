@@ -247,15 +247,20 @@ if __name__ == "__main__":
     export_folder_data = Path("E:/Argos/Processing/Pose2d/3D_to_2D")
 
     fq_file_c3d = 120
-    subject_to_fq_file_video = {"Sujet_000":120,"Sujet_001":60,
-                                "Sujet_002":60,"Sujet_003": 60,
-                                "Sujet_007": 60}
+    subject_to_fq_file_video = {"Sujet_000": 120,"Sujet_001": 60,
+                                "Sujet_002": 60,"Sujet_003": 60,
+                                "Sujet_004": 60,"Sujet_005": 60,
+                                "Sujet_006": 60,"Sujet_007": 60}
+
 
     sujet_to_list_task = {
         "Sujet_000": ["01-eat-yaourt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
         "Sujet_001": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
         "Sujet_002": ["01-eat-yoghurt", "02-cut-food", "13-playdoe_001", "06-drawing", "16-comb-hair","17-hand-to-back"],
         "Sujet_003": ["01-eat-yoghurt", "02-cut-food", "13-playdoe_002", "06-drawing", "16-comb-hair","17-hand-to-back"],
+        "Sujet_004": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair","17-hand-to-back"],
+        "Sujet_005": ["01-eat-yoghurt_001", "02-cut-food", "13-playdoe", "06-drawing_001", "16-comb-hair", "17-hand-to-back_001"],
+        "Sujet_006": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
         "Sujet_007": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair","17-hand-to-back"]}
 
 
@@ -265,8 +270,8 @@ if __name__ == "__main__":
         tasks = ["16-comb-hair"]
     else:
         path_c3d = path_to_data / "Processing" / "C3D_labelled"
-        subjects = ["Sujet_007", "Sujet_000", "Sujet_001", "Sujet_002", "Sujet_003"]
-
+        subjects = ["Sujet_000", "Sujet_001", "Sujet_002", "Sujet_003","Sujet_004","Sujet_005","Sujet_006","Sujet_007"]
+        subjects = ["Sujet_003"]
 
     add_video = True
 
@@ -291,7 +296,7 @@ if __name__ == "__main__":
             else:
                 raise ValueError(f"unit_point {unit_point} not recognized")
             if ind_task == 0:
-                add_video = False
+                add_video = True
             else:
                 add_video = False
             # for each subject only one video should be exported

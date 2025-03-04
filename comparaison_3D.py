@@ -6,7 +6,7 @@ import numpy as np
 import snip_h5py as snipH5
 from scipy.signal import butter, filtfilt
 import combinaison_camera
-
+import polars as pl
 
 
 def reorient_marker_less(point):
@@ -48,13 +48,29 @@ if not folder_data.exists():
 
 # Generate 3d_to_2d hdf5 ------------------------------------------------
 
-subjects_names = ["Sujet_000", "Sujet_001", "Sujet_002", "Sujet_003","Sujet_007", ]
+subjects_names = ["Sujet_000", "Sujet_001", "Sujet_002", "Sujet_003","Sujet_004", "Sujet_005", "Sujet_006", "Sujet_007"]
+
+
+
 sujet_to_list_task = {
-        "Sujet_000": ["01-eat-yaourt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
-        "Sujet_001": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
-        "Sujet_002": ["01-eat-yoghurt", "02-cut-food", "13-playdoe_001", "06-drawing", "16-comb-hair","17-hand-to-back"],
-        "Sujet_003": ["01-eat-yoghurt", "02-cut-food", "13-playdoe_002", "06-drawing", "16-comb-hair","17-hand-to-back"],
-        "Sujet_007": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair","17-hand-to-back"]}
+    "Sujet_000": ["01-eat-yaourt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
+    "Sujet_001": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
+    "Sujet_002": ["01-eat-yoghurt", "02-cut-food", "13-playdoe_001", "06-drawing", "16-comb-hair", "17-hand-to-back"],
+    "Sujet_003": ["01-eat-yoghurt", "02-cut-food", "13-playdoe_002", "06-drawing", "16-comb-hair", "17-hand-to-back"],
+    "Sujet_004": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
+    "Sujet_005": ["01-eat-yoghurt_001", "02-cut-food", "13-playdoe", "06-drawing_001", "16-comb-hair"],# "17-hand-to-back_001"],
+    "Sujet_006": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
+    "Sujet_007": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"]}
+
+sujet_to_list_task = {
+    "Sujet_000": ["06-drawing"],
+    "Sujet_001": ["06-drawing"],
+    "Sujet_002": ["06-drawing"],
+    "Sujet_003": ["06-drawing"],
+    "Sujet_004": ["06-drawing"],
+    "Sujet_005": ["06-drawing_001"],# "17-hand-to-back_001"],
+    "Sujet_006": ["06-drawing"],
+    "Sujet_007": ["06-drawing"]}
 
 camera_configurations = combinaison_camera.generate()
 
@@ -74,7 +90,8 @@ points_to_compare = {
 fq_file_c3d = 120
 subject_to_fq_file_video = {"Sujet_000": 120, "Sujet_001": 60,
                             "Sujet_002": 60, "Sujet_003": 60,
-                            "Sujet_007": 60}
+                            "Sujet_004": 60, "Sujet_005": 60,
+                            "Sujet_006": 60, "Sujet_007": 60}
 
 # generation of 3d c3d file with center done in comparaison_2D.py
 dict_data = dict()
@@ -184,7 +201,6 @@ for name_config, list_camera in camera_configurations.items():
 
 list_points = [["L_SJC","R_SJC"],["L_EJC","R_EJC"],["L_WJC","R_WJC"],["L_HMJC","R_HMJC"]]
 key_points = ["SJC","EJC","WJC","HMJC"]
-
 dict_final = dict()
 dict_final_percentage = dict()
 for name_config, list_camera in camera_configurations.items():

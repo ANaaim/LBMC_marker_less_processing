@@ -47,6 +47,6 @@ def generate_image_with_point_and_bounding_box(image, points, bounding_box):
 
 if __name__ == "__main__":
     path_to_folder = (
-        adress_folder.path_export_pose_framework() / "Sujet_002" / "01-eat-yoghurt" / "M11458"
+        adress_folder.path_export_pose_framework() / "Sujet_002" / "17-hand-to-back" / "M11461"
     )
     generate_images_from_folder(path_to_folder)

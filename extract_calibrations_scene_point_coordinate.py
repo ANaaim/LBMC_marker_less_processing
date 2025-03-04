@@ -3,7 +3,7 @@ import snippet_ezc3d as ezsnip
 import ezc3d
 
 # path to the c3d file
-folder_subject = Path("E:/Argos/Processing/Organized/Sujet_007")
+folder_subject = Path("E:/Argos/Processing/Organized/Sujet_004")
 #path_to_c3d = Path("C:/Users/User/Documents/Alexandre/Github/LBMC_marker_less_processing/data_montreal/c3d/Sujet_000/extrinsics.c3d")
 path_to_c3d = folder_subject / "calibration"/"c3d_extrinsics"/"extrinsics.c3d"
 path_to_txt = folder_subject / "calibration"/"c3d_extrinsics"/"extrinsics.txt"

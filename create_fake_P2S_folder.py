@@ -106,27 +106,38 @@ def read_and_export_toml_less_camera(file_path, blocks_to_export,output_file_pat
 
 formatted_folder = Path("E:/Argos/Processing/Formatted")
 pose2d_folder = Path("E:/Argos/Processing/Pose2d")
-pose3d_folder = Path("E:/Argos/Processing/Pose3d_demo")
+pose3d_folder = Path("E:/Argos/Processing/Pose3d")
 # currently it seems that exporting small json on ssd create very large files'
 temp_folder = Path("C:/Users/User/Documents/Alexandre/Github/LBMC_marker_less_processing/data_montreal/temp_P2S")
 
 # These could be obtained directly from exploring the folder pose2d.
-subject_to_process = ["Sujet_000","Sujet_001","Sujet_002","Sujet_003","Sujet_007"]
+subject_to_process = ["Sujet_004","Sujet_005","Sujet_006"]
 model_to_process = ["all_body_rtm_coktail_14_hdf5"]#,"all_body_resnet_hdf5","all_body_hrnet_coco_dark_coco_hdf5"]
 model_correction_confidence = [10,1,1]
 #model_to_process = ["all_body_resnet_hdf5","all_body_hrnet_coco_dark_coco_hdf5"]
 #model_correction_confidence = [1,1]
+#model_to_process = ["all_body_resnet_hdf5","all_body_hrnet_coco_dark_coco_hdf5"]
+#model_correction_confidence = [1,1]
 #task_to_process = ["13-playdoe_002"]
 
-sujet_to_list_task = {"Sujet_000": ["01-eat-yaourt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
-                      "Sujet_001": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
-                      "Sujet_002": ["01-eat-yoghurt", "02-cut-food", "13-playdoe_001", "06-drawing", "16-comb-hair", "17-hand-to-back"],
-                      "Sujet_003": ["01-eat-yoghurt", "02-cut-food", "13-playdoe_002", "06-drawing", "16-comb-hair", "17-hand-to-back"],
-                      "Sujet_007": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair","17-hand-to-back"]}
+sujet_to_list_task = {
+    "Sujet_000": ["01-eat-yaourt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
+    "Sujet_001": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
+    "Sujet_002": ["01-eat-yoghurt", "02-cut-food", "13-playdoe_001", "06-drawing", "16-comb-hair", "17-hand-to-back"],
+    "Sujet_003": ["01-eat-yoghurt", "02-cut-food", "13-playdoe_002", "06-drawing", "16-comb-hair", "17-hand-to-back"],
+    "Sujet_004": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
+    "Sujet_005": ["01-eat-yoghurt_001", "02-cut-food", "13-playdoe", "06-drawing_001", "16-comb-hair"],# "17-hand-to-back_001"],
+    "Sujet_006": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
+    "Sujet_007": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"]
+    }
 
 # If None all camera will be used
 with_group_unique_camera = False
 camera_configurations = combinaison_camera.generate(with_group_unique_camera)
+# remove the element in the dict with 3 letter or less
+camera_configurations = {k: v for k, v in camera_configurations.items() if len(k) > 3}
+
+
 # get all the camera configuration that have been processed
 # list all folder contained in pose3d_folder as a list
 folder_names_already_processed = [f.name for f in pose3d_folder.iterdir() if f.is_dir()]
@@ -134,9 +145,9 @@ print(folder_names_already_processed)
 
 
 for name_config, list_camera in camera_configurations.items():
-    if name_config in folder_names_already_processed:
-        print(f"Folder {name_config} already processed")
-        continue
+    # if name_config in folder_names_already_processed:
+    #     print(f"Folder {name_config} already processed")
+    #     continue
     for ind_model,model in enumerate(model_to_process):
         for subject in subject_to_process:
             task_to_process = sujet_to_list_task[subject]
