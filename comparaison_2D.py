@@ -210,7 +210,7 @@ if __name__ == "__main__":
             for camera in cameras:
                 for ind_points,points in enumerate(list_points):
                     points_name = key_points[ind_points]
-                    dict_final[model][group_camera_name][points_name] =  np.empty((1,))  #
+                    dict_final[model][group_camera_name][points_name] =  np.empty((1,2))  #
                     for point in points:
                         for subject in subjects_names:
                             for task in sujet_to_list_task[subject]:
