@@ -111,7 +111,7 @@ pose3d_folder = Path("E:/Argos/Processing/Pose3d")
 temp_folder = Path("C:/Users/User/Documents/Alexandre/Github/LBMC_marker_less_processing/data_montreal/temp_P2S")
 
 # These could be obtained directly from exploring the folder pose2d.
-subject_to_process = ["Sujet_004","Sujet_005","Sujet_006"]
+subject_to_process = ["Sujet_004"]#,"Sujet_005","Sujet_006"]
 model_to_process = ["all_body_rtm_coktail_14_hdf5"]#,"all_body_resnet_hdf5","all_body_hrnet_coco_dark_coco_hdf5"]
 model_correction_confidence = [10,1,1]
 #model_to_process = ["all_body_resnet_hdf5","all_body_hrnet_coco_dark_coco_hdf5"]
@@ -125,7 +125,7 @@ sujet_to_list_task = {
     "Sujet_001": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
     "Sujet_002": ["01-eat-yoghurt", "02-cut-food", "13-playdoe_001", "06-drawing", "16-comb-hair", "17-hand-to-back"],
     "Sujet_003": ["01-eat-yoghurt", "02-cut-food", "13-playdoe_002", "06-drawing", "16-comb-hair", "17-hand-to-back"],
-    "Sujet_004": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
+    "Sujet_004": ["01-eat-yoghurt"], #"02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
     "Sujet_005": ["01-eat-yoghurt_001", "02-cut-food", "13-playdoe", "06-drawing_001", "16-comb-hair"],# "17-hand-to-back_001"],
     "Sujet_006": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
     "Sujet_007": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"]

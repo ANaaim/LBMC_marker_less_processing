@@ -9,12 +9,12 @@ formatted_data_path = Path("E:\Argos\Processing\Formatted")
 
 # Method used for the data processing = transforms the video into points
 config_path_DLC = None
-config_path_P2S = Path("Config_Checkerboard_Montreal_Sujet_003.toml")
+config_path_P2S = Path("Config_Checkerboard_Montreal_Sujet_test.toml")
 scaling = "1.0"
 
 config_dict_P2S = toml.load(config_path_P2S)
 
-subjects =["Sujet_003"]
+subjects =["Sujet_test"]
 
 for subject in subjects:
         config_dict_P2S["markerAugmentation"]["participant_height"] = 1.83  # m
