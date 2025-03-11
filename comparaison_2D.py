@@ -102,19 +102,25 @@ def comparaison_two_data_set(path_to_mmpose_data,path_to_ref):
             # use the min value of the two
             min_nb_frame = min(nb_frame_ref, nb_frame_model_data)
 
-            dict_comp[camera][key] = np.linalg.norm(model_ref[camera][key][:min_nb_frame, 0:2] - model_data[camera][new_dict[key]][
+            dict_comp[camera][key] = np.zeros((min_nb_frame, 2))
+            dict_comp[camera][key][:,0] = np.linalg.norm(model_ref[camera][key][:min_nb_frame, 0:2] - model_data[camera][new_dict[key]][
                                                                                 :min_nb_frame, 0:2],axis=1)
+            dict_comp[camera][key][:, 1] = model_data[camera][new_dict[key]][:min_nb_frame, 2]
         # specific comp
         # R mid hand
         R_mid_hand_model = (model_data[camera][new_dict["R_HM2"]][:min_nb_frame, :] + model_data[camera][
                                                                                           new_dict["R_HM5"]][
                                                                                       :min_nb_frame, :]) / 2
-        dict_comp[camera]["R_HMJC"] = np.linalg.norm(model_ref[camera]["R_HMJC"][:min_nb_frame, 0:2] - R_mid_hand_model[:,0:2],axis=1)
+        dict_comp[camera]["R_HMJC"] = np.zeros((min_nb_frame, 2))
+        dict_comp[camera]["R_HMJC"][:,0] = np.linalg.norm(model_ref[camera]["R_HMJC"][:min_nb_frame, 0:2] - R_mid_hand_model[:,0:2],axis=1)
+        dict_comp[camera]["R_HMJC"][:, 1] = dict_comp[camera]["R_HMJC"][:,1] = (model_data[camera][new_dict["R_HM5"]][:min_nb_frame, 2] + model_data[camera][new_dict["R_HM5"]][:min_nb_frame, 2])/2
         # L mid hand
         L_mid_hand_model = (model_data[camera][new_dict["L_HM2"]][:min_nb_frame, :] + model_data[camera][
                                                                                           new_dict["L_HM5"]][
                                                                                       :min_nb_frame, :]) / 2
-        dict_comp[camera]["L_HMJC"] = np.linalg.norm(model_ref[camera]["L_HMJC"][:min_nb_frame, 0:2] - L_mid_hand_model[:,0:2],axis=1)
+        dict_comp[camera]["L_HMJC"] = np.zeros((min_nb_frame,2))
+        dict_comp[camera]["L_HMJC"][:,0] = np.linalg.norm(model_ref[camera]["L_HMJC"][:min_nb_frame, 0:2] - L_mid_hand_model[:,0:2],axis=1)
+        dict_comp[camera]["L_HMJC"][:,1] = (model_data[camera][new_dict["L_HM5"]][:min_nb_frame, 2] + model_data[camera][new_dict["L_HM5"]][:min_nb_frame, 2])/2
 
     return dict_comp
 
