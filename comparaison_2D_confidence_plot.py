@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def plot_confidence_per_view(dict_final, view_to_plot, list_points, list_model,correction_confidence, distance_threshold):
+def plot_confidence_per_view(dict_final, view_to_plot, list_points, list_model,correction_confidence, distance_threshold, gridsize=10):
     nb_row = len(list_points)
     nb_col = len(list_model)
 
@@ -23,8 +23,8 @@ def plot_confidence_per_view(dict_final, view_to_plot, list_points, list_model,c
     # Concatenate all data to determine global min and max
     all_distances = np.concatenate(all_distances)
     all_confidences = np.concatenate(all_confidences)
-    global_extent = (all_distances.min(), all_distances.max(),
-                     0.0, 1.0)
+    global_extent = (0.0, 1.0,
+                     all_distances.min(), all_distances.max())
 
     # Create subplots grid
     fig, axes = plt.subplots(nb_row, nb_col, figsize=(4 * nb_col, 4 * nb_row), squeeze=False)
@@ -41,12 +41,12 @@ def plot_confidence_per_view(dict_final, view_to_plot, list_points, list_model,c
             confidences = data[mask, 1]/correction_confidence[j]
 
             # Plot the hexbin plot in this subplot with the common extent
-            hb = ax.hexbin(distances, confidences, bins="log", gridsize=50,
+            hb = ax.hexbin(confidences,distances, bins="log", gridsize=gridsize,
                            cmap='inferno', extent=global_extent)
             hb_list.append(hb)
             ax.set_title(f"{model} - {point}")
-            ax.set_xlabel("Distance")
-            ax.set_ylabel("Confidence")
+            ax.set_ylabel("Distance")
+            ax.set_xlabel("Confidence")
             fig.colorbar(hb, ax=ax, label="Count in bin")
 
     # # Determine global color limits from all hexbin plots
@@ -81,7 +81,8 @@ if __name__ == "__main__":
 
 
     for view in list_view:
-        plot_confidence_per_view(dict_final,view, list_points,list_model,correction_confidence, 200)
+        plot_confidence_per_view(dict_final,view, list_points,list_model,
+                                 correction_confidence, 200, gridsize=30)
 
 
 
