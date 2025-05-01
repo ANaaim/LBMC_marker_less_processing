@@ -8,6 +8,7 @@ import toml
 from Pose2Sim import Pose2Sim
 import os
 import concurrent.futures
+import data_dictionary
 
 def triangulate_acquisition(acquisition, subject, formatted_data_path_by_subject, config_dict_P2S):
     print(f"Triangulating {subject} for {acquisition}")
@@ -104,17 +105,17 @@ def read_and_export_toml_less_camera(file_path, blocks_to_export,output_file_pat
         toml.dump(extracted_data, file)
 
 
-formatted_folder = Path("E:/Argos/Processing/Formatted")
-pose2d_folder = Path("E:/Argos/Processing/Pose2d")
-pose3d_folder = Path("E:/Argos/Processing/Pose3d")
+formatted_folder = Path("H:/Argos/Processing/Formatted")
+pose2d_folder = Path("H:/Argos/Processing/Pose2d")
+pose3d_folder = Path("H:/Argos/Processing/Pose3d")
 # currently it seems that exporting small json on ssd create very large files'
 #temp_folder = Path("C:/Users/User/Documents/Alexandre/Github/LBMC_marker_less_processing/data_montreal/temp_P2S")
-temp_folder = Path("C:/Users/S2Mlab/Documents/github/LBMC_marker_less_processing/temp_P2S")
+temp_folder = Path("./temp_P2S")
 
 # These could be obtained directly from exploring the folder pose2d.
 #subject_to_process = ["Sujet_000","Sujet_001","Sujet_002","Sujet_003","Sujet_007"]
 model_to_process = ["all_body_resnet_hdf5"]#,"all_body_rtm_coktail_14_hdf5""all_body_resnet_hdf5","all_body_hrnet_coco_dark_coco_hdf5"]
-model_correction_confidence = [10,1,1]
+model_correction_confidence =[1] #[10,1,1]
 #model_to_process = ["all_body_resnet_hdf5","all_body_hrnet_coco_dark_coco_hdf5"]
 #model_correction_confidence = [1,1]
 #model_to_process = ["all_body_resnet_hdf5","all_body_hrnet_coco_dark_coco_hdf5"]
@@ -151,20 +152,28 @@ sujet_to_list_task = {
     "Subject_04_TDC": ["00_Static_Stand", "12_Reaches_And_Manipulation_000", "19_Cymbals_000",
                        "13_Open_a_Bottle_and_Pour", "06_Elbow_Flexion_Extension",
                        "05_Elbow_Pronosupination_Bras_Bend"], }
-# CELLE LA DESSOUS
-sujet_to_list_task = {
-    "Subject_01_CP": ["11_Hand_to_Head", "01_Shoulder_Abduction_Adduction", ],
-    "Subject_02_CP": ["11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction"],
-    "Subject_03_CP": ["11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction"],
-    "Subject_04_CP": ["11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction"],
-    "Subject_05_CP": ["11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction"],
-    "Subject_01_TDC": ["11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction"],
-    "Subject_02_TDC": ["11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction"],
-    "Subject_03_TDC": ["11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction"],
-    "Subject_04_TDC": ["11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction_000"],
-    "Subject_05_TDC": ["00_Static_Stand", "12_Reaches_And_Manipulation", "19_Cymbals"
-        , "13_Open_a_Bottle_and_Pour", "06_Elbow_Flexion_Extension", "05_Elbow_Pronosupination_Bras_Bend",
-                       "11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction"], }
+study_CRME = data_dictionary.CRME_study()
+#list_subject_to_remove = ["Subject_01_CP", "Subject_02_CP", "Subject_03_CP", "Subject_04_CP", "Subject_05_CP",
+#                         "Subject_01_TDC", "Subject_02_TDC", "Subject_03_TDC", "Subject_04_TDC", "Subject_05_TDC",]
+list_subject_to_remove = []
+study_CRME = data_dictionary.remove_subjects(study_CRME, list_subject_to_remove)
+sujet_to_list_task = study_CRME["task"]
+
+list_subject = list(sujet_to_list_task.keys())
+# # CELLE LA DESSOUS
+# sujet_to_list_task = {
+#     "Subject_01_CP": ["11_Hand_to_Head", "01_Shoulder_Abduction_Adduction", ],
+#     "Subject_02_CP": ["11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction"],
+#     "Subject_03_CP": ["11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction"],
+#     "Subject_04_CP": ["11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction"],
+#     "Subject_05_CP": ["11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction"],
+#     "Subject_01_TDC": ["11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction"],
+#     "Subject_02_TDC": ["11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction"],
+#     "Subject_03_TDC": ["11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction"],
+#     "Subject_04_TDC": ["11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction_000"],
+#     "Subject_05_TDC": ["00_Static_Stand", "12_Reaches_And_Manipulation", "19_Cymbals"
+#         , "13_Open_a_Bottle_and_Pour", "06_Elbow_Flexion_Extension", "05_Elbow_Pronosupination_Bras_Bend",
+#                        "11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction"], }
 
 # If None all camera will be used
 with_group_unique_camera = False

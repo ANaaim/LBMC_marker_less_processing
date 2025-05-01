@@ -8,6 +8,9 @@ Check_calibration/
 Comparaison_3D/
 data_CRME/
 figure/
+Check_calibration/
+data_CRME/
+P2S_config_files/
 
 .idea/
 __pycache__/
@@ -19,6 +22,3 @@ __pycache__/
 *.svg
 toto*
 
-Check_calibration/
-
-data_CRME/
