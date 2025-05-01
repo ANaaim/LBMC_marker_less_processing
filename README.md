@@ -58,23 +58,19 @@ restructure_files(source_folder)
 ````
 
 Following this step it is possible to calculate the extrinsics and intrinsics parameters of the camera.
-## Formatting data
-TODO : Create a config file just for formatting the data ==» It should ease the process of formatting the data for the user.
 
 ## Obtaining the calibration data
-The intrinsics parameters of the camera have been calculated one time for the camera 
-each time their focal is changed.
+The intrinsics parameters of the camera have been calculated one time for the camera each time their focal is changed.
 
 Currently, 
-Subject 000,001,002,003 have been using the same focal lenght. The original calibration data are contained in test_ariane_novembre
+Subject 000,001,002,003,004,005,006,007 have been using the same focal lenght. The original calibration data are contained in test_ariane_novembre
 
 in the folder Organized/Suject_XXX/calibration
-create one folder extrinsics and one folder intrinsics
-- In the extrinsics folder add one folder for each camera with the name of the camera as the name of the folder.
-- In the intrinsics folder add a previous calibration from a previous calibration to obtain directly the intrinsics parameters in the process
-TODO : Does Calib_scene.toml should be in the intrinsics folder or directly in the calibration folder ?
-- Then the data for the scene should be generated from the extrinsics c3d. For that the user should label the point in the c3d file in a specific order. These data can be put in a folder c3d_extrinsics.
-- Then the user should run the function extract_calibrations_scene_point_coordinate.py to be used as the input in the pose2sim opition files in the [calibration] part. it will look like this :
+create one folder extrinsics and one folder intrinsics and one c3d_extrinsics
+- In the extrinsics folder add one folder for each camera with the name of the camera as the name of the folder and the video inside as name_camera.avi.
+- For the intrinsics calibration (the intrinsics folder should be empty) add a previous complete calibration (such as Calib_scene.toml) in the calibration folder to obtain directly the intrinsics parameters in the process
+- From there the data for the scene should be generated from the extrinsics.c3d. For that the user should label the point in the c3d file in a specific order. These data can be put in a folder c3d_extrinsics.
+- Then the user should run the function extract_calibrations_scene_point_coordinate.py to be used as the input in the pose2sim option files in the [calibration] part. it will look like this :
 ```toml
    [calibration.calculate]
       # Camera properties, theoretically need to be calculated only once in a camera lifetime
@@ -112,6 +108,11 @@ Now the calibration integrating the rotation of the video is done. We now have t
 
 Calibration can be verified using the function projection_on_video.py which will allow to reproject directly the c3d on the video using a formatted folder and the c3d files.
 It is proposed here to have the 
+
+
+## Formatting data
+TODO : Create a config file just for formatting the data ==» It should ease the process of formatting the data for the user.
+
 
 ## Generating the pose2d data.
 In our project we want to generate the pose2d data from different model of pose estimation to be able to compare them.

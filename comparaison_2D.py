@@ -6,6 +6,7 @@ import joint_center_calculation_montreal as joint_calc
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import data_dictionary
 
 def compute_UL_joitn_centers(path_to_data):
     path_to_data_str = str(path_to_data)
@@ -129,19 +130,22 @@ if __name__ == "__main__":
     path_to_pose2d = Path("E:/Argos/Processing/Pose2d")
     path_to_export = Path("./Comparaison_2D")
     # Generate 3d_to_2d hdf5 ------------------------------------------------
+    study = data_dictionary.CRME_study()
+    study = data_dictionary.remove_tasks(study, ["00_S","01_S","02_S","11"])
+    study = data_dictionary.remove_subjects(study, ["Subject_05_TDC","Subject_03_TDC"])
 
-    subjects_names = ["Sujet_000", "Sujet_001", "Sujet_002", "Sujet_003", "Sujet_004", "Sujet_005", "Sujet_006", "Sujet_007"]
-    #task_to_process = ["16-comb-hair.c3d"]
-    # TODO : retrained all model sujet_005 17-hand-to-back_001
-    sujet_to_list_task = {
-        "Sujet_000": ["01-eat-yaourt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
-        "Sujet_001": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
-        "Sujet_002": ["01-eat-yoghurt", "02-cut-food", "13-playdoe_001", "06-drawing", "16-comb-hair","17-hand-to-back"],
-        "Sujet_003": ["01-eat-yoghurt", "02-cut-food", "13-playdoe_002", "06-drawing", "16-comb-hair","17-hand-to-back"],
-        "Sujet_004": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair","17-hand-to-back"],
-        "Sujet_005": ["01-eat-yoghurt_001", "02-cut-food", "13-playdoe", "06-drawing_001", "16-comb-hair"],# "17-hand-to-back_001"],
-        "Sujet_006": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
-        "Sujet_007": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair","17-hand-to-back"]}
+    sujet_to_list_task = study["task"]
+    subjects_names = list(study["task"].keys())
+    fq_file_c3d = 120
+    subject_to_fq_file_video = study["fq_video"]
+    # subjects_names = ["Sujet_007", "Sujet_000"]#, "Sujet_001", "Sujet_002", "Sujet_003"]
+    # #task_to_process = ["16-comb-hair.c3d"]
+    # sujet_to_list_task = {
+    #     "Sujet_000": ["01-eat-yaourt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
+    #     "Sujet_001": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
+    #     "Sujet_002": ["01-eat-yoghurt", "02-cut-food", "13-playdoe_001", "06-drawing", "16-comb-hair","17-hand-to-back"],
+    #     "Sujet_003": ["01-eat-yoghurt", "02-cut-food", "13-playdoe_002", "06-drawing", "16-comb-hair","17-hand-to-back"],
+    #     "Sujet_007": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair","17-hand-to-back"]}
 
     # sujet_to_list_task = {
     #     "Sujet_000": ["06-drawing"],
@@ -152,8 +156,8 @@ if __name__ == "__main__":
     generate_3d_to_2d_hdf5(path_to_data_labelled, subjects_names, sujet_to_list_task)
 
     # Comparaison with data form mmpose ------------------------------------------------
-
-    list_model = ["all_body_hrnet_coco_dark_coco_hdf5","all_body_resnet_hdf5","all_body_rtm_coktail_14_hdf5"]
+    #list_model = ["all_body_hrnet_coco_dark_coco_hdf5","all_body_resnet_hdf5","all_body_rtm_coktail_14_hdf5"]
+    list_model = ["all_body_rtm_coktail_14_hdf5"]
 
     keypoints = reduce_whole_body_coco_keypoints()
     keypoints = {value: key for key, value in keypoints.items()}

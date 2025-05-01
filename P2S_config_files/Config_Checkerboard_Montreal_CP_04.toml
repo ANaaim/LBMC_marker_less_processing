@@ -18,7 +18,7 @@
 [LBMC]
 remove_old_c3d = false
    [LBMC.formatting]
-   to_do = true
+   to_do = false
    task_to_remove = []
    scaling = 1.0
    [LBMC.keypoints_identification]
@@ -90,7 +90,7 @@ filter_order = 4
 
 # Take heart, calibration is not that complicated once you get the hang of it!
 [calibration]
-to_do = false
+to_do = true
 calibration_type = 'calculate' # 'convert' or 'calculate' or "already calculated"
 
    [calibration.convert]
@@ -112,7 +112,7 @@ calibration_type = 'calculate' # 'convert' or 'calculate' or "already calculated
       overwrite_intrinsics = false # overwrite (or not) if they have already been calculated?
       show_detection_intrinsics = false # true or false (lowercase)
       intrinsics_extension = 'avi' # any video or image extension
-      extract_every_N_sec = 0.2 # if video, extract frames every N seconds (can be <1 )
+      extract_every_N_sec = 4 # if video, extract frames every N seconds (can be <1 )
       intrinsics_corners_nb = [4,9]
       intrinsics_square_size = 150 # mm
 
@@ -136,26 +136,25 @@ calibration_type = 'calculate' # 'convert' or 'calculate' or "already calculated
          extrinsics_extension = 'avi' # any video or image extension
          # list of 3D coordinates to be manually labelled on images. Can also be a 2 dimensional plane.
          # in m -> unlike for intrinsics, NOT in mm!
-         object_coords_3d =   [[-0.826011, 0.102669, -0.720026],
-                                [1.460018, 0.098172, -0.725373],
-                                [1.431619, 1.319247, -0.723156],
-                                [-0.802174, 1.320674, -0.712992],
-                                [-0.269962, 0.398085, -0.721150],
-                                [0.955338, 0.404646, -0.725520],
-                                [0.949928, 1.016406, -0.722184],
-                                [-0.271026, 1.014553, -0.716889],
-                                [-0.579329, 0.708172, -0.718167],
-                                [0.034157, 0.706519, -0.719298],
-                                [0.644511, 0.710826, -0.721543],
-                                [1.258117, 0.709415, -0.724234],
-                                [0.010573, 0.010567, 0.005462],
-                                [0.599345, 0.014607, 0.008254],
-                                [0.585707, 1.406837, 0.010956],
-                                [0.015663, 1.512833, 0.012839],
-                                [0.225632, 0.666536, 0.750196],
-                                [0.427247, 0.666516, 0.747504],
-                                [0.420675, 0.919240, 0.749144],
-                                [0.217358, 0.919311, 0.751867],]
+         object_coords_3d =   [[0.856939, 1.233339, -0.570246],
+                                [0.401570, 1.309683, -0.568136],
+                                [-0.291658, 1.321346, -0.556456],
+                                [-0.610742, 0.958624, -0.552682],
+                                [-0.229671, 0.543309, -0.559216],
+                                [-0.245366, 0.162806, -0.560480],
+                                [0.382626, 0.206482, -0.568350],
+                                [0.824195, 0.195306, -0.570529],
+                                [0.852383, 0.792700, -0.570442],
+                                [0.387304, 0.726377, -0.567947],
+                                [0.656129, 1.322290, 0.294747],
+                                [0.159589, 1.340638, 0.302197],
+                                [0.095353, 0.101971, 0.297867],
+                                [0.646219, 0.098443, 0.294539],
+                                [0.479042, 0.921785, 0.820931],
+                                [0.322496, 0.924822, 0.824412],
+                                [0.316697, 0.613536, 0.824389],
+                                [0.472492, 0.606028, 0.820211],]
+
          [calibration.calculate.extrinsics.keypoints]
          # Coming soon!
 

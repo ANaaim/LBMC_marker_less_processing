@@ -3,13 +3,24 @@ import snippet_ezc3d as ezsnip
 import ezc3d
 
 # path to the c3d file
-folder_subject = Path("E:/Argos/Processing/Organized/Sujet_004")
+#folder_subject = Path("C:/Users/S2Mlab/Documents/github/LBMC_marker_less_processing/data_CRME/Processing/Organized/fake_subject_02")
+folder_subject = Path("H:/Argos/Processing/Organized/Subject_08_CP")
 #path_to_c3d = Path("C:/Users/User/Documents/Alexandre/Github/LBMC_marker_less_processing/data_montreal/c3d/Sujet_000/extrinsics.c3d")
 path_to_c3d = folder_subject / "calibration"/"c3d_extrinsics"/"extrinsics.c3d"
 path_to_txt = folder_subject / "calibration"/"c3d_extrinsics"/"extrinsics.txt"
 
 acq_c3d = ezc3d.c3d(str(path_to_c3d))
 points_c3d, points_name_c3d, points_ind_c3d = ezsnip.get_points_ezc3d(acq_c3d)
+
+# Check the unit of the file 
+print(acq_c3d["parameters"]["POINT"]["UNITS"]["value"][0])
+
+if acq_c3d["parameters"]["POINT"]["UNITS"]["value"][0] == "mm":
+    print("The unit of the file is in mm")
+    points_c3d = points_c3d / 1000  # convert to meters
+    print("The unit of the file has been converted to m")
+else:
+    print("The unit of the file is already in m")
 
 # export the output in the following text format [[0.0,  0.0,  0.0],
 #                               [0.0,  0.45,  0.0],

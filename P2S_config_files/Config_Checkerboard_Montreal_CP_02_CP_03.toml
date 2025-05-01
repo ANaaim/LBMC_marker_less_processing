@@ -112,7 +112,7 @@ calibration_type = 'calculate' # 'convert' or 'calculate' or "already calculated
       overwrite_intrinsics = false # overwrite (or not) if they have already been calculated?
       show_detection_intrinsics = false # true or false (lowercase)
       intrinsics_extension = 'avi' # any video or image extension
-      extract_every_N_sec = 0.2 # if video, extract frames every N seconds (can be <1 )
+      extract_every_N_sec = 4 # if video, extract frames every N seconds (can be <1 )
       intrinsics_corners_nb = [4,9]
       intrinsics_square_size = 150 # mm
 
@@ -136,27 +136,25 @@ calibration_type = 'calculate' # 'convert' or 'calculate' or "already calculated
          extrinsics_extension = 'avi' # any video or image extension
          # list of 3D coordinates to be manually labelled on images. Can also be a 2 dimensional plane.
          # in m -> unlike for intrinsics, NOT in mm!
-         object_coords_3d =   [[-0.853160, 0.116150, -0.721085],
-[1.445179, 0.130289, -0.725677],
-[1.415427, 1.345854, -0.721055],
-[-0.830978, 1.334368, -0.712470],
-[-0.595535, 0.421098, -0.721233],
-[0.315003, 0.422205, -0.723424],
-[0.926944, 0.427731, -0.725505],
-[0.925768, 1.036738, -0.721334],
-[0.315571, 1.032930, -0.717836],
-[-0.598280, 1.029822, -0.715381],
-[0.010010, 0.006154, 0.004465],
-[0.598507, 0.011058, 0.006526],
-[0.600488, 1.515301, 0.012300],
-[0.010413, 1.513473, 0.012738],
-[0.008665, 0.347096, 0.005653],
-[0.224415, 0.629736, 0.747781],
-[0.416757, 0.629826, 0.747852],
-[0.421694, 0.884171, 0.750203],
-[0.253992, 0.834895, 0.746954],
+         object_coords_3d =   [[0.917197, 1.343974, -0.585182],
+                                [0.369133, 1.311638, -0.589239],
+                                [-0.329679, 1.314653, -0.586757],
+                                [-0.628666, 0.948172, -0.588956],
+                                [-0.242910, 0.537010, -0.592645],
+                                [-0.244217, 0.150779, -0.594449],
+                                [0.373182, 0.215814, -0.594652],
+                                [0.977384, 0.211555, -0.590633],
+                                [0.952123, 0.810230, -0.587313],
+                                [0.422221, 0.731824, -0.592282],
+                                [0.655726, 1.397869, -0.012583],
+                                [0.179537, 1.287751, -0.014018],
+                                [0.085266, 0.118453, -0.021019],
+                                [0.628117, 0.107245, -0.018022],
+                                [0.440020, 0.852020, 0.508139],
+                                [0.301141, 0.821186, 0.509826],
+                                [0.298317, 0.553379, 0.508113],
+                                [0.443247, 0.541935, 0.507963],]
 
-                                ]
          [calibration.calculate.extrinsics.keypoints]
          # Coming soon!
 

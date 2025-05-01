@@ -239,18 +239,17 @@ def process_folder(path_video, c3d_full_path, subject, task, fq_file_c3d, fq_fil
 
 if __name__ == "__main__":
 
-    verif_raw_data = False
+    verif_raw_data = True
     # Folder
-    path_to_data = Path("E:/Argos")
+    path_to_data = Path("./data_CRME")
     path_video = path_to_data / "Processing" / "Formatted"
-    export_video_folder = Path("E:/Argos/Processing/Check_calibration")
-    export_folder_data = Path("E:/Argos/Processing/Pose2d/3D_to_2D")
+    export_video_folder = Path("./Check_calibration")
+    export_folder_data = Path("./Pose2d/3D_to_2D")
 
     fq_file_c3d = 120
-    subject_to_fq_file_video = {"Sujet_000": 120,"Sujet_001": 60,
-                                "Sujet_002": 60,"Sujet_003": 60,
-                                "Sujet_004": 60,"Sujet_005": 60,
-                                "Sujet_006": 60,"Sujet_007": 60}
+    subject_to_fq_file_video = {"Sujet_000":120,"Sujet_001":60,
+                                "Sujet_002":60,"Sujet_003": 60,
+                                "Sujet_007": 60,"fake_subject": 120,"fake_subject_02": 120}
 
 
     sujet_to_list_task = {
@@ -266,8 +265,8 @@ if __name__ == "__main__":
 
     if verif_raw_data:
         path_c3d = path_to_data/ "raw_c3d"
-        subjects = ["Sujet_003"]
-        tasks = ["16-comb-hair"]
+        subjects = ["fake_subject_02"]
+        tasks = ["verification"]
     else:
         path_c3d = path_to_data / "Processing" / "C3D_labelled"
         subjects = ["Sujet_000", "Sujet_001", "Sujet_002", "Sujet_003","Sujet_004","Sujet_005","Sujet_006","Sujet_007"]
@@ -284,7 +283,10 @@ if __name__ == "__main__":
         for ind_task,task in enumerate(tasks):
             export_video_folder_subject = export_video_folder / subject / task
             final_name = task + ".c3d"
-            c3d_full_path = path_c3d / subject / "with_center" /final_name
+            if verif_raw_data:
+                c3d_full_path = path_c3d / subject  / final_name
+            else:
+                c3d_full_path = path_c3d / subject / "with_center" /final_name
             type_calib = "scene"
             # Extract the unit of the c3d file in order to be able to define the conversion_factor
             acq = ezc3d.c3d(str(c3d_full_path))

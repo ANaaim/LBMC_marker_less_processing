@@ -18,7 +18,7 @@
 [LBMC]
 remove_old_c3d = false
    [LBMC.formatting]
-   to_do = true
+   to_do = false
    task_to_remove = []
    scaling = 1.0
    [LBMC.keypoints_identification]
@@ -31,7 +31,7 @@ remove_old_c3d = false
    # You will have to go see the parametre in the following section
    # [pose]
    [LBMC.2D_to_3D]
-   to_do = true
+   to_do = false
    # You will have to go see the parametre in the following section
    # Person association
    # Triangulation
@@ -112,7 +112,7 @@ calibration_type = 'calculate' # 'convert' or 'calculate' or "already calculated
       overwrite_intrinsics = false # overwrite (or not) if they have already been calculated?
       show_detection_intrinsics = false # true or false (lowercase)
       intrinsics_extension = 'avi' # any video or image extension
-      extract_every_N_sec = 0.2 # if video, extract frames every N seconds (can be <1 )
+      extract_every_N_sec = 4 # if video, extract frames every N seconds (can be <1 )
       intrinsics_corners_nb = [4,9]
       intrinsics_square_size = 150 # mm
 
@@ -136,20 +136,25 @@ calibration_type = 'calculate' # 'convert' or 'calculate' or "already calculated
          extrinsics_extension = 'avi' # any video or image extension
          # list of 3D coordinates to be manually labelled on images. Can also be a 2 dimensional plane.
          # in m -> unlike for intrinsics, NOT in mm!
-         object_coords_3d =   [[0.004644, 0.000034, 0.005962],
-              [2.290803, 0.001110, 0.016975],
-[2.264257, 1.218686, 0.020926],
-[0.041503, 1.218982, 0.015180],
-[1.173410, 0.303591, 0.012748],
-[1.172003, 0.912014, 0.016960],
-[0.831911, 0.070315, 0.738973],
-[1.418195, 0.053579, 0.743392],
-[1.457477, 1.187996, 0.747479],
-[0.867250, 1.197984, 0.744521],
-[1.079364, 0.449062, 1.484198],
-[1.270512, 0.439477, 1.484014],
-[1.278089, 0.693037, 1.486048],
-[1.084153, 0.700204, 1.486283],]
+         object_coords_3d =   [[0.817562, 1.250647, -0.632735],
+                              [0.367295, 1.313048, -0.635552],
+                              [-0.339619, 1.300442, -0.632784],
+                              [-0.641926, 0.943886, -0.635087],
+                              [-0.240734, 0.522549, -0.638428],
+                              [-0.247007, 0.140442, -0.641087],
+                              [0.373033, 0.208099, -0.641591],
+                              [0.830295, 0.213830, -0.638867],
+                              [0.829156, 0.814844, -0.634890],
+                              [0.376626, 0.713545, -0.637784],
+                              [0.571694, 1.315133, 0.267120],
+                              [0.137299, 1.282664, 0.265393],
+                              [0.136782, 0.166329, 0.257612],
+                              [0.571081, 0.154512, 0.259243],
+                              [0.397305, 0.923831, 0.790491],
+                              [0.272373, 0.916360, 0.787783],
+                              [0.244701, 0.619774, 0.786877],
+                              [0.397298, 0.620955, 0.789008],]
+
          [calibration.calculate.extrinsics.keypoints]
          # Coming soon!
 

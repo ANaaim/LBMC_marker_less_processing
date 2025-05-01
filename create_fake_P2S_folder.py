@@ -108,11 +108,12 @@ formatted_folder = Path("E:/Argos/Processing/Formatted")
 pose2d_folder = Path("E:/Argos/Processing/Pose2d")
 pose3d_folder = Path("E:/Argos/Processing/Pose3d")
 # currently it seems that exporting small json on ssd create very large files'
-temp_folder = Path("C:/Users/User/Documents/Alexandre/Github/LBMC_marker_less_processing/data_montreal/temp_P2S")
+#temp_folder = Path("C:/Users/User/Documents/Alexandre/Github/LBMC_marker_less_processing/data_montreal/temp_P2S")
+temp_folder = Path("C:/Users/S2Mlab/Documents/github/LBMC_marker_less_processing/temp_P2S")
 
 # These could be obtained directly from exploring the folder pose2d.
-subject_to_process = ["Sujet_004"]#,"Sujet_005","Sujet_006"]
-model_to_process = ["all_body_rtm_coktail_14_hdf5"]#,"all_body_resnet_hdf5","all_body_hrnet_coco_dark_coco_hdf5"]
+#subject_to_process = ["Sujet_000","Sujet_001","Sujet_002","Sujet_003","Sujet_007"]
+model_to_process = ["all_body_resnet_hdf5"]#,"all_body_rtm_coktail_14_hdf5""all_body_resnet_hdf5","all_body_hrnet_coco_dark_coco_hdf5"]
 model_correction_confidence = [10,1,1]
 #model_to_process = ["all_body_resnet_hdf5","all_body_hrnet_coco_dark_coco_hdf5"]
 #model_correction_confidence = [1,1]
@@ -120,27 +121,60 @@ model_correction_confidence = [10,1,1]
 #model_correction_confidence = [1,1]
 #task_to_process = ["13-playdoe_002"]
 
+# sujet_to_list_task = {"Sujet_000": ["01-eat-yaourt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
+#                       "Sujet_001": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
+#                       "Sujet_002": ["01-eat-yoghurt", "02-cut-food", "13-playdoe_001", "06-drawing", "16-comb-hair", "17-hand-to-back"],
+#                       "Sujet_003": ["01-eat-yoghurt", "02-cut-food", "13-playdoe_002", "06-drawing", "16-comb-hair", "17-hand-to-back"],
+#                       "Sujet_007": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair","17-hand-to-back"]}
+
+# list CRME
+#subject_to_process = ["Subject_01_CP","Subject_01_TDC","Subject_02_CP","Subject_02_TDC","Subject_03_CP","Subject_03_TDC"]
+#subject_to_process = ["Subject_04_PC","Subject_05_PC","Subject_04_TDC"]
+subject_to_process = ["Subject_01_CP","Subject_01_TDC","Subject_02_CP","Subject_02_TDC","Subject_03_CP","Subject_03_TDC"]# to modify
 sujet_to_list_task = {
-    "Sujet_000": ["01-eat-yaourt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
-    "Sujet_001": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
-    "Sujet_002": ["01-eat-yoghurt", "02-cut-food", "13-playdoe_001", "06-drawing", "16-comb-hair", "17-hand-to-back"],
-    "Sujet_003": ["01-eat-yoghurt", "02-cut-food", "13-playdoe_002", "06-drawing", "16-comb-hair", "17-hand-to-back"],
-    "Sujet_004": ["01-eat-yoghurt"], #"02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
-    "Sujet_005": ["01-eat-yoghurt_001", "02-cut-food", "13-playdoe", "06-drawing_001", "16-comb-hair"],# "17-hand-to-back_001"],
-    "Sujet_006": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
-    "Sujet_007": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"]
-    }
+    "Subject_01_CP": ["00_Static_Stand", "12_Reaches_And_Manipulation", "19_Cymbals", "13_Open_a_Bottle_and_Pour",
+                      "06_Elbow_Flexion_Extension", "05_Elbow_Pronosupination_Bras_Bend"],
+    "Subject_01_TDC": ["00_Static_Stand", "12_Reaches_And_Manipulation", "19_Cymbals", "13_Open_a_Bottle_and_Pour",
+                       "06_Elbow_Flexion_Extension", "05_Elbow_Pronosupination_Bras_Bend"],
+    "Subject_02_CP": ["00_Static_Stand", "12_Reaches_And_Manipulation", "19_Cymbals", "13_Open_a_Bottle_and_Pour",
+                      "06_Elbow_Flexion_Extension", "05_Elbow_Pronosupination_Bras_Bend"],
+    "Subject_02_TDC": ["00_Static_Stand", "12_Reaches_And_Manipulation_001", "19_Cymbals", "13_Open_a_Bottle_and_Pour",
+                       "06_Elbow_Flexion_Extension", "05_Elbow_Pronosupination_Bras_Bend"],
+    "Subject_03_CP": ["00_Static_Stand", "12_Reaches_And_Manipulation", "19_Cymbals", "13_Open_a_Bottle_and_Pour",
+                      "06_Elbow_Flexion_Extension", "05_Elbow_Pronosupination_Bras_Bend"],
+    "Subject_03_TDC": ["00_Static_Stand", "12_Reaches_And_Manipulation", "13_Open_a_Bottle_and_Pour",
+                       "06_Elbow_Flexion_Extension_000", "05_Elbow_Pronosupination_Bras_Bend"],
+    "Subject_04_PC": ["00_Static_Stand", "12_Reaches_And_Manipulation", "19_Cymbals", "13_Open_a_Bottle_and_Pour",
+                      "06_Elbow_Flexion_Extension", "05_Elbow_Pronosupination_Bras_Bend"],
+    "Subject_05_PC": ["00_Static_Stand", "12_Reaches_And_Manipulation", "19_Cymbals", "13_Open_a_Bottle_and_Pour",
+                      "06_Elbow_Flexion_Extension", "05_Elbow_Pronosupination_Bras_Bend"],
+    "Subject_04_TDC": ["00_Static_Stand", "12_Reaches_And_Manipulation_000", "19_Cymbals_000",
+                       "13_Open_a_Bottle_and_Pour", "06_Elbow_Flexion_Extension",
+                       "05_Elbow_Pronosupination_Bras_Bend"], }
+# CELLE LA DESSOUS
+sujet_to_list_task = {
+    "Subject_01_CP": ["11_Hand_to_Head", "01_Shoulder_Abduction_Adduction", ],
+    "Subject_02_CP": ["11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction"],
+    "Subject_03_CP": ["11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction"],
+    "Subject_04_CP": ["11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction"],
+    "Subject_05_CP": ["11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction"],
+    "Subject_01_TDC": ["11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction"],
+    "Subject_02_TDC": ["11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction"],
+    "Subject_03_TDC": ["11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction"],
+    "Subject_04_TDC": ["11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction_000"],
+    "Subject_05_TDC": ["00_Static_Stand", "12_Reaches_And_Manipulation", "19_Cymbals"
+        , "13_Open_a_Bottle_and_Pour", "06_Elbow_Flexion_Extension", "05_Elbow_Pronosupination_Bras_Bend",
+                       "11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction"], }
 
 # If None all camera will be used
 with_group_unique_camera = False
 camera_configurations = combinaison_camera.generate(with_group_unique_camera)
-# remove the element in the dict with 3 letter or less
 camera_configurations = {k: v for k, v in camera_configurations.items() if len(k) > 3}
-
-
+camera_configurations = {'ABCDE' :camera_configurations["ABCDE"]}
 # get all the camera configuration that have been processed
 # list all folder contained in pose3d_folder as a list
 folder_names_already_processed = [f.name for f in pose3d_folder.iterdir() if f.is_dir()]
+folder_names_already_processed = []
 print(folder_names_already_processed)
 
 
@@ -216,8 +250,8 @@ for name_config, list_camera in camera_configurations.items():
 
             #TODO : We should have generate a configuration file with the point at the end adapted from the hdf5 file used.
 
-            config_path_P2S = Path("Config_Checkerboard_Montreal_triangulation_only_without_model.toml")
-            new_config_path_P2S = Path("config_P2S_temp_triangulation.toml")
+            config_path_P2S = Path("P2S_config_files","Config_Checkerboard_Montreal_triangulation_only_without_model.toml")
+            new_config_path_P2S = Path("P2S_config_files","config_P2S_temp_triangulation.toml")
             # Read the existing config file
             with open(config_path_P2S, "r") as file:
                 config_content = file.read()

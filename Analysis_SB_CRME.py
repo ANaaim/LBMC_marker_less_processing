@@ -117,7 +117,6 @@ for name_config, list_camera in camera_configurations.items():
                 dict_percentage_nan = dict()
                 fq_video = subject_to_fq_file_video[subject]
                 for name_point_ref,name_point_ML in points_to_compare.items():
-                    dict_distance[name_point_ref] = dict()
                     ref = points_data_ref[:, points_ind_ref[name_point_ref], ::int(fq_file_c3d/fq_video)]
                     # let s filter the point ML with a 5Hz filter butterwotrt
                     #ref = butter_lowpass_filter(ref, 5, fq_file_c3d, order=4)
@@ -133,17 +132,9 @@ for name_config, list_camera in camera_configurations.items():
                     else:
                         ref = ref[:,:ML_orient.shape[1]]
                     # calculate distance between two point
-                    vector_distance = ref - ML_orient
-                    dict_distance[name_point_ref]["norm"] = np.linalg.norm(vector_distance,axis=0)
-                    dict_distance[name_point_ref]["X"] = vector_distance[0,:]
-                    dict_distance[name_point_ref]["Y"] = vector_distance[1,:]
-                    dict_distance[name_point_ref]["Z"] = vector_distance[2,:]
-
+                    dict_distance[name_point_ref] = np.linalg.norm(ref - ML_orient,axis=0)
                     # calculate the percentage of Nan
                     dict_percentage_nan[name_point_ref] = calculate_percentage_nan(ML_orient)
-
-
-
                 ref_LHM = points_data_ref[:, points_ind_ref["L_HMJC"], ::int(fq_file_c3d / fq_video)]
                 ref_RHM = points_data_ref[:, points_ind_ref["R_HMJC"], ::int(fq_file_c3d / fq_video)]
                 ML_RHM2 = points_data_ML[:, points_ind_ML["R_MCP_index"], :]
@@ -170,21 +161,8 @@ for name_config, list_camera in camera_configurations.items():
                 min_size_L = min(ref_LHM.shape[1],ML_LHM.shape[1])
                 min_size_R = min(ref_RHM.shape[1],ML_RHM.shape[1])
 
-                vector_dist_R_hand = ref_RHM[:,:min_size_R] - reorient_marker_less(ML_RHM[:,:min_size_R])
-                vector_dist_L_hand = ref_LHM[:,:min_size_L] - reorient_marker_less(ML_LHM[:,:min_size_L])
-                dict_distance["R_HMJC"] = dict()
-                dict_distance["L_HMJC"] = dict()
-
-                dict_distance["R_HMJC"]["norm"] = np.linalg.norm(ref_RHM[:,:min_size_R] - reorient_marker_less(ML_RHM[:,:min_size_R]),axis=0)
-                dict_distance["R_HMJC"]["X"] = vector_dist_R_hand[0,:]
-                dict_distance["R_HMJC"]["Y"] = vector_dist_R_hand[1,:]
-                dict_distance["R_HMJC"]["Z"] = vector_dist_R_hand[2,:]
-
-                dict_distance["L_HMJC"]["norm"] = np.linalg.norm(ref_LHM[:,:min_size_L] - reorient_marker_less(ML_LHM[:,:min_size_L]),axis=0)
-                dict_distance["L_HMJC"]["X"] = vector_dist_L_hand[0,:]
-                dict_distance["L_HMJC"]["Y"] = vector_dist_L_hand[1,:]
-                dict_distance["L_HMJC"]["Z"] = vector_dist_L_hand[2,:]
-
+                dict_distance["R_HMJC"] = np.linalg.norm(ref_RHM[:,:min_size_R] - reorient_marker_less(ML_RHM[:,:min_size_R]),axis=0)
+                dict_distance["L_HMJC"] = np.linalg.norm(ref_LHM[:,:min_size_L] - reorient_marker_less(ML_LHM[:,:min_size_L]),axis=0)
                 dict_percentage_nan["R_HMJC"] = calculate_percentage_nan(reorient_marker_less(ML_RHM))
                 dict_percentage_nan["L_HMJC"] = calculate_percentage_nan(reorient_marker_less(ML_LHM))
 
@@ -193,8 +171,51 @@ for name_config, list_camera in camera_configurations.items():
 
 
 
+
 list_points = [["L_SJC","R_SJC"],["L_EJC","R_EJC"],["L_WJC","R_WJC"],["L_HMJC","R_HMJC"]]
 key_points = ["SJC","EJC","WJC","HMJC"]
+
+dict_comp_population = dict()
+
+for name_config, list_camera in camera_configurations.items():
+    dict_comp_population[name_config]=dict()
+    for model in list_model:
+        dict_comp_population[name_config][model]  = dict()
+        for ind_points,points in enumerate(list_points):
+            points_name = key_points[ind_points]  #           
+            for point in points:
+                # Intialize the dict for each point
+                for subject in subjects_names:
+                    for task in sujet_to_list_task[subject]:
+                        if "_000" in task or "_001" in task:
+                            task_name = task.replace("_000", "").replace("_001", "")
+                        else:
+                            task_name = task 
+                        dict_comp_population[name_config][model][task_name] = dict()
+                        dict_comp_population[name_config][model][task_name]["CP"] = dict()
+                        dict_comp_population[name_config][model][task_name]["TDC"] = dict()
+
+                    
+
+                for subject in subjects_names:
+                    if "TDC" in subject:
+                        population = "TDC"
+                    elif "CP" in subject:
+                        population = "CP"
+                    else:
+                        raise ValueError("subject not in TDC or CP")
+                    for task in sujet_to_list_task[subject]:
+                        if "_000" in task or "_001" in task:
+                            task_name = task.replace("_000", "").replace("_001", "")
+                        else:
+                            task_name = task  
+
+                        if points_name not in dict_comp_population[name_config][model][task_name][population]:
+                            dict_comp_population[name_config][model][task_name][population][points_name] = dict_data[name_config][model][subject][task][point]
+                        else:
+                            dict_comp_population[name_config][model][task_name][population][points_name] = np.append(dict_comp_population[name_config][model] [points_name], dict_data[name_config][model][subject][task][point])
+
+
 dict_final = dict()
 dict_final_percentage = dict()
 for name_config, list_camera in camera_configurations.items():
@@ -205,35 +226,22 @@ for name_config, list_camera in camera_configurations.items():
         dict_final_percentage[name_config][model] = dict()
         for ind_points,points in enumerate(list_points):
             points_name = key_points[ind_points]
-            dict_final[name_config][model][points_name] = dict()   #
-            dict_final[name_config][model][points_name]["norm"] = np.empty((1,))
-            dict_final[name_config][model][points_name]["X"] = np.empty((1,))
-            dict_final[name_config][model][points_name]["Y"] = np.empty((1,))
-            dict_final[name_config][model][points_name]["Z"] = np.empty((1,))
-
+            dict_final[name_config][model] [points_name] =  np.empty((1,))  #
             percentage = []
             for point in points:
 
                 for subject in subjects_names:
                     for task in sujet_to_list_task[subject]:
                         percentage.append(dict_data_percentage[name_config][model][subject][task][point])
-                        if dict_final[name_config][model][points_name]["norm"].shape[0] == 1:
-                            dict_final[name_config][model][points_name]["norm"] = dict_data[name_config][model][subject][task][point]["norm"]
-                            dict_final[name_config][model][points_name]["X"] = dict_data[name_config][model][subject][task][point]["X"]
-                            dict_final[name_config][model][points_name]["Y"] = dict_data[name_config][model][subject][task][point]["Y"]
-                            dict_final[name_config][model][points_name]["Z"] = dict_data[name_config][model][subject][task][point]["Z"]
+                        if dict_final[name_config][model] [points_name].shape[0] == 1:
+                            dict_final[name_config][model] [points_name] = dict_data[name_config][model] [subject][task][point]
                         else:
-                            dict_final[name_config][model][points_name]["norm"] = np.append(dict_final[name_config][model][points_name]["norm"], dict_data[name_config][model][subject][task][point]["norm"])
-                            dict_final[name_config][model][points_name]["X"] = np.append(dict_final[name_config][model][points_name]["X"], dict_data[name_config][model][subject][task][point]["X"])
-                            dict_final[name_config][model][points_name]["Y"] = np.append(dict_final[name_config][model][points_name]["Y"], dict_data[name_config][model][subject][task][point]["Y"])
-                            dict_final[name_config][model][points_name]["Z"] = np.append(dict_final[name_config][model][points_name]["Z"], dict_data[name_config][model][subject][task][point]["Z"])
-
+                            dict_final[name_config][model] [points_name] = np.append(dict_final[name_config][model] [points_name], dict_data[name_config][model] [subject][task][point])
             dict_final_percentage[name_config][model][points_name] = np.mean(percentage)
 # save the dict_final
 snipH5.save_dictionary_to_hdf(dict_final, folder_data / "comparaison_final_3d.h5")
 # save the dict_data_percentage
 snipH5.save_dictionary_to_hdf(dict_final_percentage, folder_data / "comparaison_percentage_3d.h5")
-list_parameters = ["norm","X","Y","Z"]
 # calculate the absolut mean and std of the data for each combinaison model, camera, points
 dict_mean_std = dict()
 for name_config, list_camera in camera_configurations.items():
@@ -242,16 +250,14 @@ for name_config, list_camera in camera_configurations.items():
         dict_mean_std[name_config][model] = dict()
         for point in key_points:
             dict_mean_std[name_config][model][point] = dict()
-            for name_param in list_parameters:
-                dict_mean_std[name_config][model][point][name_param] = dict()
-                mean = np.nanmean(np.abs(dict_final[name_config][model][point][name_param]),axis=0)
-                std = np.nanstd(np.abs(dict_final[name_config][model][point][name_param]),axis=0)
-                min = np.nanmin(np.abs(dict_final[name_config][model][point][name_param]),axis=0)
-                max = np.nanmax(np.abs(dict_final[name_config][model][point][name_param]),axis=0)
+            mean = np.nanmean(np.abs(dict_final[name_config][model] [point]),axis=0)
+            std = np.nanstd(np.abs(dict_final[name_config][model] [point]),axis=0)
+            min = np.nanmin(np.abs(dict_final[name_config][model] [point]),axis=0)
+            max = np.nanmax(np.abs(dict_final[name_config][model] [point]),axis=0)
 
-                dict_mean_std[name_config][model][point][name_param]["mean"] = mean
-                dict_mean_std[name_config][model][point][name_param]["std"] = std
-                dict_mean_std[name_config][model][point][name_param]["min"] = min
-                dict_mean_std[name_config][model][point][name_param]["max"] = max
+            dict_mean_std[name_config][model][point]["mean"] = mean
+            dict_mean_std[name_config][model][point]["std"] = std
+            dict_mean_std[name_config][model][point]["min"] = min
+            dict_mean_std[name_config][model][point]["max"] = max
 # save the mean and std
 snipH5.save_dictionary_to_hdf(dict_mean_std, folder_data/"mean_std_3d.h5")

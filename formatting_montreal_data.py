@@ -11,7 +11,7 @@ def restructure_files(source_folder):
 
                 if "intrinsic" in filename:
                     new_name_task = "intrinsic"
-                    camera_to_export = nametask.split("_")[1]
+                    camera_to_export = nametask.split("_")[0]
                     if camera_id == camera_to_export:
 
                         new_dir = os.path.join(source_folder, new_name_task, camera_id)
@@ -27,7 +27,7 @@ def restructure_files(source_folder):
                     shutil.move(os.path.join(source_folder, filename), os.path.join(new_dir, new_filename))
 
 # source_folder = 'D:\Users\naaim\Documents\LBMC_marker_less_processing\data_montreal\organized\test_extrinsics'
-source_folder = Path("E:/Argos/temp_folder/Sujet_004_pb_fq/half_fq")
+source_folder = Path("H:/Argos/raw_data/Subject_06_TDC/Video")
 
 #source_folder = 'D:\Users\naaim\Documents\LBMC_marker_less_processing\data_montreal\organized\test_extrinsics'
 restructure_files(source_folder)

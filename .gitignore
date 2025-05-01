@@ -3,6 +3,12 @@
 LBMC_marker_less/
 ISB_Analysis/
 data_montreal/
+temp_P2S/
+Check_calibration/
+Comparaison_3D/
+data_CRME/
+figure/
+
 .idea/
 __pycache__/
 
