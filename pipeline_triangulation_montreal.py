@@ -12,7 +12,7 @@ formatted_data_path = Path("D:\Argos\Processing\temp_P2S")
 
 # Method used for the data processing = transforms the video into points
 config_path_DLC = None
-config_path_P2S = Path("Config_Checkerboard_Montreal_Sujet_test.toml")
+config_path_P2S = Path("P2S_config_files","Config_Checkerboard_Montreal_Sujet_test.toml")
 scaling = "1.0"
 
 config_dict_P2S = toml.load(config_path_P2S)
