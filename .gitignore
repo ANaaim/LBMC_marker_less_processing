@@ -12,3 +12,7 @@ __pycache__/
 *.png
 *.svg
 toto*
+
+Check_calibration/
+
+data_CRME/
