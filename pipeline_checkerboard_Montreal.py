@@ -7,20 +7,26 @@ import os
 # organized_data_path = Path(".\data_CRME\Processing\Organized")
 # formatted_data_path = Path(".\data_CRME\Processing\Formatted")
 
+# Hard drive CRME
 organized_data_path = Path("H:\Argos\Processing\Organized")
 formatted_data_path = Path("H:\Argos\Processing\Formatted")
+
+# Hard drive S2M
+organized_data_path = Path("G:\Argos_CEPSUM\Processing\Organized")
+formatted_data_path = Path("G:\Argos_CEPSUM\Processing\Formatted")
 
 # Method used for the data processing = transforms the video into points
 config_path_DLC = None
 #config_path_P2S = Path("P2S_config_files","Config_Checkerboard_formatting_CRME.toml")
 #config_path_P2S = Path("P2S_config_files","Config_Checkerboard_Montreal_formatting_only.toml")
-config_path_P2S = Path("P2S_config_files","Config_Checkerboard_Montreal_just_rotation.toml")
-#config_path_P2S = Path("P2S_config_files","Config_Checkerboard_Montreal_CP_08.toml")
+#config_path_P2S = Path("P2S_config_files","Config_Checkerboard_Montreal_just_rotation.toml")
+config_path_P2S = Path("P2S_config_files","Config_Checkerboard_Montreal_Sujet_008.toml")
+
 scaling = "1.0"
 
 config_dict_P2S = toml.load(config_path_P2S)
-
-subjects =["Subject_06_CP","Subject_07_CP","Subject_08_CP"]
+print(config_dict_P2S)
+subjects =["Sujet_008"]
 
 for subject in subjects:
         config_dict_P2S["markerAugmentation"]["participant_height"] = 1.83  # m
