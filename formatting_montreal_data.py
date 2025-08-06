@@ -27,7 +27,7 @@ def restructure_files(source_folder):
                     shutil.move(os.path.join(source_folder, filename), os.path.join(new_dir, new_filename))
 
 # source_folder = 'D:\Users\naaim\Documents\LBMC_marker_less_processing\data_montreal\organized\test_extrinsics'
-source_folder = Path("H:/Argos/raw_data/Subject_06_TDC/Video")
-
+source_folder = Path("H:/Argos/Processing/Organized/Subject_10_CP")
+source_folder = Path("G:/Argos_CEPSUM/Export_video/Sujet_14")
 #source_folder = 'D:\Users\naaim\Documents\LBMC_marker_less_processing\data_montreal\organized\test_extrinsics'
 restructure_files(source_folder)
