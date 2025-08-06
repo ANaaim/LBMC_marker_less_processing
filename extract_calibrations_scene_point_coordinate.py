@@ -4,7 +4,9 @@ import ezc3d
 
 # path to the c3d file
 #folder_subject = Path("C:/Users/S2Mlab/Documents/github/LBMC_marker_less_processing/data_CRME/Processing/Organized/fake_subject_02")
-folder_subject = Path("H:/Argos/Processing/Organized/Subject_08_CP")
+folder_subject = Path("H:/Argos/Processing/Organized/Subject_10_CP")
+folder_subject = Path("G:/Argos_CEPSUM/Export_video/Sujet_08")
+folder_subject = Path("G:/Argos_CEPSUM/Processing/Organized/Sujet_014")
 #path_to_c3d = Path("C:/Users/User/Documents/Alexandre/Github/LBMC_marker_less_processing/data_montreal/c3d/Sujet_000/extrinsics.c3d")
 path_to_c3d = folder_subject / "calibration"/"c3d_extrinsics"/"extrinsics.c3d"
 path_to_txt = folder_subject / "calibration"/"c3d_extrinsics"/"extrinsics.txt"
