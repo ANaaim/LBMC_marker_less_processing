@@ -10,7 +10,8 @@ data_CRME/
 figure/
 Check_calibration/
 data_CRME/
-P2S_config_files/
+data_LBMC/
+data_trotinette/
 
 .idea/
 __pycache__/
