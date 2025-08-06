@@ -30,7 +30,7 @@ def add_point_on_video_and_export(path_to_video, point_2D, output_path):
     points = np.array(point_2D)
     points[np.isnan(points)] = 0
     points = points.astype(int)
-
+    
     while cap.isOpened():
         ret, frame = cap.read()
         # we should check if are not in the last frame that could not exist in the c3d files as the number of frame is not the sam
@@ -236,9 +236,94 @@ def process_folder(path_video, c3d_full_path, subject, task, fq_file_c3d, fq_fil
             data_to_export[camera_name][name] = value_to_export
     return data_to_export
 
+def main_CRME():
+    verif_raw_data = False
+    # Folder
+    path_to_data = Path("H:/Argos")
+    path_to_data = Path("G:/Argos_CEPSUM")
+    path_video = path_to_data / "Processing" / "Formatted"
+    export_video_folder = Path("./Check_calibration")
+    export_folder_data = path_to_data /"Processing" / "Pose2d" / "3D_to_2D"
+    folder_data = Path("./Comparaison_3D")
+    path_c3d = path_to_data / "Processing" / "C3D_labelled"
+    path_to_data_non_labelled = path_to_data / "Labelling" 
+    import data_dictionary
+    # Generate 3d_to_2d hdf5 ------------------------------------------------
+    #study = data_dictionary.CRME_study()
+    #study = data_dictionary.remove_tasks(study, ["00_S"])
+    # study = data_dictionary.remove_subjects(study, ["Subject_05_CP","Subject_04_TDC","Subject_06_TDC","Subject_07_TDC","Subject_08_TDC"
+    #                                                     ,"Subject_06_CP","Subject_07_CP","Subject_08_CP",])
+    # study = data_dictionary.remove_subjects(study, ["Subject_01_TDC","Subject_02_TDC","Subject_03_TDC","Subject_01_CP","Subject_03_CP","Subject_04_CP",
+    #                                                 "Subject_06_TDC","Subject_07_TDC","Subject_08_TDC"
+    #                                                     ,"Subject_06_CP","Subject_07_CP","Subject_08_CP",])
+    #study = data_dictionary.keep_subjects(study, ["Subject_09_CP","Subject_10_CP","Subject_10_TDC","Subject_11_TDC",])
+    #study = data_dictionary.keep_tasks(study, ["12_Rea"])
+    
+    study = data_dictionary.S2M_study()
+    # 13 on subject 03 tdc
+    study = data_dictionary.remove_tasks(study, ["00_S"])
+    
+    #study = data_dictionary.keep_subjects(study, ["Subject_06_TDC","Subject_07_TDC","Subject_08_TDC","Subject_09_TDC","Subject_10_TDC",
+    #                                              "Subject_06_CP","Subject_07_CP","Subject_08_CP","Subject_09_CP","Subject_10_CP"])
+    
+    study = data_dictionary.remove_subjects(study, ["Sujet_000","Sujet_001","Sujet_002","Sujet_003","Sujet_004","Sujet_005","Sujet_006","Sujet_007",
+                                                    "fake_008","Sujet_009","Sujet_010","Sujet_011","Sujet_012","Sujet_013","Sujet_014"])
 
-if __name__ == "__main__":
+    sujet_to_list_task = study["task"]
+    subjects_names = list(study["task"].keys())
+    from_labelled_data = False
+    task_to_show_marker =  "13-playdoe" # could also be a part of the name of the task
+    for subject in subjects_names:
+        print(subject)
+        tasks = sujet_to_list_task[subject]
+        for ind_task,task in enumerate(tasks):
+            print(task)
+            export_video_folder_subject = export_video_folder / subject / task
+            final_name = task + ".c3d"
+            if from_labelled_data:
+                c3d_full_path = path_c3d / subject / "with_center" / final_name
+            else:
+                c3d_full_path =  path_to_data_non_labelled / subject / final_name
+            type_calib = "scene"
+            # Extract the unit of the c3d file in order to be able to define the conversion_factor
+            acq = ezc3d.c3d(str(c3d_full_path))
+            unit_point = acq["parameters"]["POINT"]["UNITS"]["value"][0]
+            if unit_point == "mm":
+                conversion_factor = 1000
+            elif unit_point == "m":
+                conversion_factor = 1
+            else:
+                raise ValueError(f"unit_point {unit_point} not recognized")
+            # Get the number of frame in the c3d file
+            nb_frame_c3d = acq["data"]["points"].shape[2]
+            
+            # Get the number of frame in the video
+            video_full_path = path_video / subject / task / "videos" / "M11462" / ("M11462" + ".avi")
+            cap = cv2.VideoCapture(str(video_full_path))
+            points_video_nb_frame = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
+            ratio = round(nb_frame_c3d / points_video_nb_frame)
+            # due to problem with motive we have to check for each trial the frequency of the c3d file and the video
+            fq_file_c3d = ratio
+            fq_file_video = 1
+            # test if the name of video contains 12_Reaches
+            if task_to_show_marker in task:
+                add_video = True
+            else:
+                add_video = False
+            
+            # for each subject only one video should be exported
+            data_to_export = process_folder(
+                path_video, c3d_full_path, subject, task, fq_file_c3d, fq_file_video, conversion_factor, add_video, export_video_folder_subject,
+            type_calib)
+
+            path_to_hdf5 = Path(export_folder_data, subject, task)
+            #path_to_annotation = Path(export_folder, subject, task, "annotation")
+            #filename = f"{subject}_{task}.h5"
+            filename = f"{task}.h5"
+            save_and_export.save_hdf5(data_to_export, path_to_hdf5, filename)
+
+def main_S2M():
     verif_raw_data = True
     # Folder
     path_to_data = Path("./data_CRME")
@@ -315,3 +400,7 @@ if __name__ == "__main__":
             save_and_export.save_hdf5(data_to_export, path_to_hdf5, filename)
             #save_and_export.export_data_to_json(data_to_export, path_to_json_folder)
             #save_and_export.export_data_to_annotation(data_to_export, path_to_annotation, ["RHJC","RKJC","RAJC"])
+
+if __name__ == "__main__":
+    main_CRME()
+    #main_S2M()
