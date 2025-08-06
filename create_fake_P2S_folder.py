@@ -104,82 +104,62 @@ def read_and_export_toml_less_camera(file_path, blocks_to_export,output_file_pat
     with open(output_file_path, 'w') as file:
         toml.dump(extracted_data, file)
 
+CRME_style = True
+if CRME_style:
+    formatted_folder = Path("H:/Argos/Processing/Formatted")
+    pose2d_folder = Path("H:/Argos/Processing/Pose2d")
+    pose3d_folder = Path("H:/Argos/Processing/Pose3d")
+    pose2d_folder = Path("E:/code/github/analysis_mmpose/mono_subject")
+    pose3d_folder = Path("E:/code/github/analysis_mmpose/mono_subject_3D_20px")
+    study_CRME = data_dictionary.CRME_study()
 
-formatted_folder = Path("H:/Argos/Processing/Formatted")
-pose2d_folder = Path("H:/Argos/Processing/Pose2d")
-pose3d_folder = Path("H:/Argos/Processing/Pose3d")
+    # list_subject_to_remove = [ "Subject_06_CP", "Subject_07_CP", "Subject_08_CP",
+    #                           "Subject_06_TDC", "Subject_07_TDC", "Subject_08_TDC"]
+    # list_task_to_remove = ["walk"]
+    # study_CRME = data_dictionary.remove_tasks(study_CRME, list_task_to_remove)
+    #list_subject_to_remove = []
+    #study_CRME = data_dictionary.keep_tasks(study_CRME, ["11_H"])
+    #study_CRME = data_dictionary.keep_subjects(study_CRME, ["Subject_06_CP","Subject_07_CP","Subject_08_CP","Subject_09_CP","Subject_10_CP",
+    #                        "Subject_06_TDC", "Subject_07_TDC","Subject_08_TDC","Subject_09_TDC","Subject_10_TDC", "Subject_11_TDC"])
+    study_CRME = data_dictionary.remove_subjects(study_CRME, ["Subject_09_CP","Subject_10_CP","Subject_11_CP",
+                                                              "Subject_09_TDC","Subject_10_TDC","Subject_11_TDC"])
+    name_calib_file = "Calib_scene.toml" 
+else:
+    data_folder = "data_trotinette"
+    formatted_folder = Path(".",data_folder,"Formatted")
+    pose2d_folder = Path(".",data_folder,"Pose2d")
+    pose3d_folder = Path(".",data_folder,"Pose3d")
+    study_CRME = data_dictionary.trotinette_study()
+    name_calib_file = "Calib_qualisys.toml"
+
 # currently it seems that exporting small json on ssd create very large files'
 #temp_folder = Path("C:/Users/User/Documents/Alexandre/Github/LBMC_marker_less_processing/data_montreal/temp_P2S")
 temp_folder = Path("./temp_P2S")
 
 # These could be obtained directly from exploring the folder pose2d.
 #subject_to_process = ["Sujet_000","Sujet_001","Sujet_002","Sujet_003","Sujet_007"]
-model_to_process = ["all_body_resnet_hdf5"]#,"all_body_rtm_coktail_14_hdf5""all_body_resnet_hdf5","all_body_hrnet_coco_dark_coco_hdf5"]
-model_correction_confidence =[1] #[10,1,1]
-#model_to_process = ["all_body_resnet_hdf5","all_body_hrnet_coco_dark_coco_hdf5"]
-#model_correction_confidence = [1,1]
-#model_to_process = ["all_body_resnet_hdf5","all_body_hrnet_coco_dark_coco_hdf5"]
-#model_correction_confidence = [1,1]
-#task_to_process = ["13-playdoe_002"]
-
-# sujet_to_list_task = {"Sujet_000": ["01-eat-yaourt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
-#                       "Sujet_001": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair", "17-hand-to-back"],
-#                       "Sujet_002": ["01-eat-yoghurt", "02-cut-food", "13-playdoe_001", "06-drawing", "16-comb-hair", "17-hand-to-back"],
-#                       "Sujet_003": ["01-eat-yoghurt", "02-cut-food", "13-playdoe_002", "06-drawing", "16-comb-hair", "17-hand-to-back"],
-#                       "Sujet_007": ["01-eat-yoghurt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair","17-hand-to-back"]}
-
+model_to_process = ["all_body_rtm_coktail_14_hdf5"]#,"all_body_rtm_coktail_14_hdf5""all_body_resnet_hdf5","all_body_hrnet_coco_dark_coco_hdf5"]
+model_correction_confidence =[10] #[10,1,1]
+# TODO :Redo CP01 02 et 03 sur all_body_rtm_coktail_14_hdf5
+model_to_process = ["all_body_rtm_coktail_14_hdf5","all_body_resnet_hdf5","all_body_hrnet_coco_dark_coco_hdf5"]
+model_correction_confidence = [10,1,1] # [10,1,1]
+print(model_correction_confidence)
 # list CRME
-#subject_to_process = ["Subject_01_CP","Subject_01_TDC","Subject_02_CP","Subject_02_TDC","Subject_03_CP","Subject_03_TDC"]
-#subject_to_process = ["Subject_04_PC","Subject_05_PC","Subject_04_TDC"]
-subject_to_process = ["Subject_01_CP","Subject_01_TDC","Subject_02_CP","Subject_02_TDC","Subject_03_CP","Subject_03_TDC"]# to modify
-sujet_to_list_task = {
-    "Subject_01_CP": ["00_Static_Stand", "12_Reaches_And_Manipulation", "19_Cymbals", "13_Open_a_Bottle_and_Pour",
-                      "06_Elbow_Flexion_Extension", "05_Elbow_Pronosupination_Bras_Bend"],
-    "Subject_01_TDC": ["00_Static_Stand", "12_Reaches_And_Manipulation", "19_Cymbals", "13_Open_a_Bottle_and_Pour",
-                       "06_Elbow_Flexion_Extension", "05_Elbow_Pronosupination_Bras_Bend"],
-    "Subject_02_CP": ["00_Static_Stand", "12_Reaches_And_Manipulation", "19_Cymbals", "13_Open_a_Bottle_and_Pour",
-                      "06_Elbow_Flexion_Extension", "05_Elbow_Pronosupination_Bras_Bend"],
-    "Subject_02_TDC": ["00_Static_Stand", "12_Reaches_And_Manipulation_001", "19_Cymbals", "13_Open_a_Bottle_and_Pour",
-                       "06_Elbow_Flexion_Extension", "05_Elbow_Pronosupination_Bras_Bend"],
-    "Subject_03_CP": ["00_Static_Stand", "12_Reaches_And_Manipulation", "19_Cymbals", "13_Open_a_Bottle_and_Pour",
-                      "06_Elbow_Flexion_Extension", "05_Elbow_Pronosupination_Bras_Bend"],
-    "Subject_03_TDC": ["00_Static_Stand", "12_Reaches_And_Manipulation", "13_Open_a_Bottle_and_Pour",
-                       "06_Elbow_Flexion_Extension_000", "05_Elbow_Pronosupination_Bras_Bend"],
-    "Subject_04_PC": ["00_Static_Stand", "12_Reaches_And_Manipulation", "19_Cymbals", "13_Open_a_Bottle_and_Pour",
-                      "06_Elbow_Flexion_Extension", "05_Elbow_Pronosupination_Bras_Bend"],
-    "Subject_05_PC": ["00_Static_Stand", "12_Reaches_And_Manipulation", "19_Cymbals", "13_Open_a_Bottle_and_Pour",
-                      "06_Elbow_Flexion_Extension", "05_Elbow_Pronosupination_Bras_Bend"],
-    "Subject_04_TDC": ["00_Static_Stand", "12_Reaches_And_Manipulation_000", "19_Cymbals_000",
-                       "13_Open_a_Bottle_and_Pour", "06_Elbow_Flexion_Extension",
-                       "05_Elbow_Pronosupination_Bras_Bend"], }
-study_CRME = data_dictionary.CRME_study()
-#list_subject_to_remove = ["Subject_01_CP", "Subject_02_CP", "Subject_03_CP", "Subject_04_CP", "Subject_05_CP",
-#                         "Subject_01_TDC", "Subject_02_TDC", "Subject_03_TDC", "Subject_04_TDC", "Subject_05_TDC",]
-list_subject_to_remove = []
-study_CRME = data_dictionary.remove_subjects(study_CRME, list_subject_to_remove)
-sujet_to_list_task = study_CRME["task"]
 
+
+sujet_to_list_task = study_CRME["task"]
 list_subject = list(sujet_to_list_task.keys())
-# # CELLE LA DESSOUS
-# sujet_to_list_task = {
-#     "Subject_01_CP": ["11_Hand_to_Head", "01_Shoulder_Abduction_Adduction", ],
-#     "Subject_02_CP": ["11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction"],
-#     "Subject_03_CP": ["11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction"],
-#     "Subject_04_CP": ["11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction"],
-#     "Subject_05_CP": ["11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction"],
-#     "Subject_01_TDC": ["11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction"],
-#     "Subject_02_TDC": ["11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction"],
-#     "Subject_03_TDC": ["11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction"],
-#     "Subject_04_TDC": ["11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction_000"],
-#     "Subject_05_TDC": ["00_Static_Stand", "12_Reaches_And_Manipulation", "19_Cymbals"
-#         , "13_Open_a_Bottle_and_Pour", "06_Elbow_Flexion_Extension", "05_Elbow_Pronosupination_Bras_Bend",
-#                        "11_Hand_to_Head", "02_Shoulder_Flexion_Extension", "01_Shoulder_Abduction_Adduction"], }
 
 # If None all camera will be used
 with_group_unique_camera = False
 camera_configurations = combinaison_camera.generate(with_group_unique_camera)
-camera_configurations = {k: v for k, v in camera_configurations.items() if len(k) > 3}
-camera_configurations = {'ABCDE' :camera_configurations["ABCDE"]}
+if CRME_style:
+    #camera_configurations = {k: v for k, v in camera_configurations.items() if len(k) > 3}
+    camera_configurations = {'ABCDE' :camera_configurations["ABCDE"]}
+else:
+    # LBMC style
+    camera_configurations = {'ABCDE' :["26578","26579","26580","26581","26582","26583","26584","26585","26586","26587"]}
+    #camera_configurations = {'ABCDE' :["cam_1","cam_2","cam_3","cam_4","cam_5","cam_6","cam_7","cam_8","cam_9","cam_10"]}
 # get all the camera configuration that have been processed
 # list all folder contained in pose3d_folder as a list
 folder_names_already_processed = [f.name for f in pose3d_folder.iterdir() if f.is_dir()]
@@ -187,27 +167,28 @@ folder_names_already_processed = []
 print(folder_names_already_processed)
 
 
+
 for name_config, list_camera in camera_configurations.items():
     # if name_config in folder_names_already_processed:
     #     print(f"Folder {name_config} already processed")
     #     continue
     for ind_model,model in enumerate(model_to_process):
-        for subject in subject_to_process:
+        for subject in list_subject:
             task_to_process = sujet_to_list_task[subject]
             for task in task_to_process:
                 print(f"Generating fake folder for  {model} with  {subject} for  {task}")
                 # Get the calibration folder
                 # knowing the subject we can find the calibration file
-                calibration_path = formatted_folder / subject / "calibration" / "Calib_scene.toml"
+                calibration_path = formatted_folder / subject / "calibration" / name_calib_file
                 new_calibration_path = temp_folder / model / subject / "calibration"
                 #test if the new calibration folder exists
                 if not new_calibration_path.exists():
                     new_calibration_path.mkdir(parents=True)
                 # copy the calibration file in function of the camera to integrate
                 if list_camera is not None:
-                    read_and_export_toml_less_camera(calibration_path, list_camera, new_calibration_path/"Calib_scene.toml")
+                    read_and_export_toml_less_camera(calibration_path, list_camera, new_calibration_path/name_calib_file)
                 else:
-                    shutil.copyfile(calibration_path, new_calibration_path/"Calib_scene.toml")
+                    shutil.copyfile(calibration_path, new_calibration_path/name_calib_file)
 
                 # Get the hdf5 files
                 filename = task+".h5"
@@ -235,6 +216,16 @@ for name_config, list_camera in camera_configurations.items():
                             "0010": "R_wrist",
                             "0011": "L_hip",
                             "0012": "R_hip",
+                            "0013": "L_knee",
+                            "0014": "R_knee",
+                            "0015": "L_ankle",
+                            "0016": "R_ankle",
+                            "0017": "L_Bigtoe",
+                            "0018": "L_Smalltoe",
+                            "0019": "L_Heel",
+                            "0020": "R_Bigtoe",
+                            "0021": "R_Smalltoe",
+                            "0022": "R_Heel",
                             "0091": "L_base_hand",
                             "0093": "L_MCP_thumb",
                             "0096": "L_MCP_index",
