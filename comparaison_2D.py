@@ -114,25 +114,31 @@ def comparaison_two_data_set(path_to_mmpose_data,path_to_ref):
                                                                                       :min_nb_frame, :]) / 2
         dict_comp[camera]["R_HMJC"] = np.zeros((min_nb_frame, 2))
         dict_comp[camera]["R_HMJC"][:,0] = np.linalg.norm(model_ref[camera]["R_HMJC"][:min_nb_frame, 0:2] - R_mid_hand_model[:,0:2],axis=1)
-        dict_comp[camera]["R_HMJC"][:, 1] = dict_comp[camera]["R_HMJC"][:,1] = (model_data[camera][new_dict["R_HM5"]][:min_nb_frame, 2] + model_data[camera][new_dict["R_HM5"]][:min_nb_frame, 2])/2
+        dict_comp[camera]["R_HMJC"][:, 1] = dict_comp[camera]["R_HMJC"][:,1] = (model_data[camera][new_dict["R_HM5"]][:min_nb_frame, 2] + model_data[camera][new_dict["R_HM2"]][:min_nb_frame, 2])/2
         # L mid hand
         L_mid_hand_model = (model_data[camera][new_dict["L_HM2"]][:min_nb_frame, :] + model_data[camera][
                                                                                           new_dict["L_HM5"]][
                                                                                       :min_nb_frame, :]) / 2
         dict_comp[camera]["L_HMJC"] = np.zeros((min_nb_frame,2))
         dict_comp[camera]["L_HMJC"][:,0] = np.linalg.norm(model_ref[camera]["L_HMJC"][:min_nb_frame, 0:2] - L_mid_hand_model[:,0:2],axis=1)
-        dict_comp[camera]["L_HMJC"][:,1] = (model_data[camera][new_dict["L_HM5"]][:min_nb_frame, 2] + model_data[camera][new_dict["L_HM5"]][:min_nb_frame, 2])/2
+        dict_comp[camera]["L_HMJC"][:,1] = (model_data[camera][new_dict["L_HM5"]][:min_nb_frame, 2] + model_data[camera][new_dict["L_HM2"]][:min_nb_frame, 2])/2
 
     return dict_comp
 
 if __name__ == "__main__":
-    path_to_data_labelled = Path("E:/Argos/Processing/C3D_labelled")
-    path_to_pose2d = Path("E:/Argos/Processing/Pose2d")
+    path_to_data_labelled = Path("H:/Argos/Processing/C3D_labelled")
+    path_to_pose2d = Path("H:\Argos\Processing\Pose2d\iou_20250505")
+    path_to_pose2d = Path("E:/code/github/analysis_mmpose/mono_subject")
     path_to_export = Path("./Comparaison_2D")
     # Generate 3d_to_2d hdf5 ------------------------------------------------
-    study = data_dictionary.CRME_study()
-    study = data_dictionary.remove_tasks(study, ["00_S","01_S","02_S","11"])
-    study = data_dictionary.remove_subjects(study, ["Subject_05_TDC","Subject_03_TDC"])
+    #study = data_dictionary.CRME_study()
+
+    study = data_dictionary.CRME_study_ISB()
+    # 13 on subject 03 tdc
+    study = data_dictionary.remove_tasks(study, ["00_S"])
+    
+    study = data_dictionary.remove_subjects(study, ["Subject_09_TDC","Subject_10_TDC","Subject_11_TDC",
+                                                    "Subject_09_CP","Subject_10_CP"])
 
     sujet_to_list_task = study["task"]
     subjects_names = list(study["task"].keys())
@@ -156,8 +162,8 @@ if __name__ == "__main__":
     generate_3d_to_2d_hdf5(path_to_data_labelled, subjects_names, sujet_to_list_task)
 
     # Comparaison with data form mmpose ------------------------------------------------
-    #list_model = ["all_body_hrnet_coco_dark_coco_hdf5","all_body_resnet_hdf5","all_body_rtm_coktail_14_hdf5"]
-    list_model = ["all_body_rtm_coktail_14_hdf5"]
+    list_model = ["all_body_hrnet_coco_dark_coco_hdf5","all_body_resnet_hdf5","all_body_rtm_coktail_14_hdf5"]
+    #list_model = ["all_body_rtm_coktail_14_hdf5"]
 
     keypoints = reduce_whole_body_coco_keypoints()
     keypoints = {value: key for key, value in keypoints.items()}
@@ -200,8 +206,16 @@ if __name__ == "__main__":
     # Model->Camera->Points
 
     list_camera = dict_lvl_model[list_model[0]][subjects_names[0]][sujet_to_list_task[subjects_names[0]][0]].keys()
-    list_camera = [["M11463"],['M11141','M11458'],['M11139','M11459'],['M11140','M11461'],['M11462']]
-    name_camera = ["A","B","C","D","E"]
+    # S2M part 1
+    #list_camera = [["M11463"],['M11141','M11458'],['M11139','M11459'],['M11140','M11461'],['M11462']]
+    #name_camera = ["A","B","C","D","E"]
+
+    # CRME
+    # list_camera = [['M11461','M11141'],['M11139','M11459'],['M11462','M11463'],['M11458'],['M11140']]
+    # name_camera = ["A","B","C","D","E"]
+    list_camera = [['M11461'],['M11141'],['M11139'],['M11459'],['M11463'],['M11462'],['M11458']]
+    name_camera = ["R_back","L_back","R_lat"
+    "","L_lat","R_front","L_front","Up"]
 
     list_points = [["L_SJC","R_SJC"],["L_EJC","R_EJC"],["L_WJC","R_WJC"],["L_HMJC","R_HMJC"]]
     key_points = ["SJC","EJC","WJC","HMJC"]
@@ -226,9 +240,52 @@ if __name__ == "__main__":
                                 nb_point = dict_lvl_model[model][subject][task][camera][point].shape[0]
                                 dict_final[model][group_camera_name][points_name] = np.append(dict_final[model][group_camera_name][points_name],
                                                                                               dict_lvl_model[model][subject][task][camera][point],axis=0)
-
+    
     # save the dict_final
     snipH5.save_dictionary_to_hdf(dict_final,  path_to_export/ "comparaison_final.h5")
+    ## ---------------------------------------------------------------------------------------------
+    ## Separation in two population 
+    # after you’ve built subjects_names…
+    populations = {
+        "TDC": [s for s in subjects_names if "TDC" in s],
+        "CP" : [s for s in subjects_names if "CP"  in s],
+    }
+    key_points   = ["SJC","EJC","WJC","HMJC"]
+    dict_final_pop = {}
+
+    for model in list_model:
+        dict_final_pop[model] = {}
+
+        # ── loop over populations ──────────────────────────────────────────────
+        for pop_name, pop_subjects in populations.items():
+            dict_final_pop[model][pop_name] = {}
+
+            # ── loop over camera-groups (A, B, C…) ──────────────────────────────
+            for ind_group_camera, cameras in enumerate(list_camera):
+                group_camera_name = name_camera[ind_group_camera]
+                dict_final_pop[model][pop_name][group_camera_name] = {}
+
+                # ── loop over your 4 point-pairs ─────────────────────────────────
+                for ind_points, points in enumerate(list_points):
+                    points_name = key_points[ind_points]
+
+                    # start with an empty (0×2) array
+                    all_errors = np.empty((0, 2))
+
+                    # accumulate errors for every (camera, point, subject, task)
+                    for camera in cameras:
+                        for point in points:
+                            for subject in pop_subjects:
+                                for task in sujet_to_list_task[subject]:
+                                    errs = dict_lvl_model[model][subject][task][camera][point]
+                                    all_errors = np.append(all_errors, errs, axis=0)
+
+                    dict_final_pop[model][pop_name][group_camera_name][points_name] = all_errors
+    
+    # save the dict_final_pop
+    snipH5.save_dictionary_to_hdf(dict_final_pop,  path_to_export/ "comparaison_final_pop.h5")
+
+    # --------------------------------------------------------------------------------------------
     # calculate the absolut mean and std of the data for each combinaison model, camera, points
     dict_mean_std = dict()
     for model in list_model:
@@ -243,33 +300,33 @@ if __name__ == "__main__":
     #snipH5.save_dictionary_to_hdf(dict_std, "std.h5")
     # Convert the dict_mean_std to a DataFrame
     # Convert the dict_mean_std to a DataFrame
-    data = []
-    for model, cameras in dict_mean_std.items():
-        for camera, points in cameras.items():
-            for point, values in points.items():
-                mean, std = values
-                data.append([model, camera, point, mean, std])
+    # data = []
+    # for model, cameras in dict_mean_std.items():
+    #     for camera, points in cameras.items():
+    #         for point, values in points.items():
+    #             mean, std = values
+    #             data.append([model, camera, point, mean, std])
 
-    df = pd.DataFrame(data, columns=['Model', 'Camera', 'Point', 'Mean', 'Std'])
+    # df = pd.DataFrame(data, columns=['Model', 'Camera', 'Point', 'Mean', 'Std'])
 
-    # Pivot the DataFrame to get the desired format
-    df_pivot = df.pivot_table(index='Point', columns=['Camera', 'Model'], values=['Mean', 'Std'])
+    # # Pivot the DataFrame to get the desired format
+    # df_pivot = df.pivot_table(index='Point', columns=['Camera', 'Model'], values=['Mean', 'Std'])
 
-    # Flatten the multi-level columns
-    df_pivot.columns = [f'{col[1]}_{col[0]}' for col in df_pivot.columns]
+    # # Flatten the multi-level columns
+    # df_pivot.columns = [f'{col[1]}_{col[0]}' for col in df_pivot.columns]
 
-    # Reorder columns to place each mean next to its corresponding std
-    ordered_columns = []
-    for col in df_pivot.columns:
-        if 'Mean' in col:
-            std_col = col.replace('Mean', 'Std')
-            ordered_columns.append(col)
-            ordered_columns.append(std_col)
+    # # Reorder columns to place each mean next to its corresponding std
+    # ordered_columns = []
+    # for col in df_pivot.columns:
+    #     if 'Mean' in col:
+    #         std_col = col.replace('Mean', 'Std')
+    #         ordered_columns.append(col)
+    #         ordered_columns.append(std_col)
 
-    df_pivot = df_pivot[ordered_columns]
+    # df_pivot = df_pivot[ordered_columns]
 
-    # Save the DataFrame to an Excel file
-    df_pivot.to_excel('mean_std_ordered.xlsx')
+    # # Save the DataFrame to an Excel file
+    # df_pivot.to_excel('mean_std_ordered.xlsx')
 
 
 

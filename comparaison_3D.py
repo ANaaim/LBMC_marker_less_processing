@@ -39,17 +39,22 @@ def butter_lowpass_filter(data, cutoff, fs, order=4):
     y = filtfilt(b, a, data, axis=1)
     return y
 
-path_to_data_labelled = Path("E:/Argos/Processing/C3D_labelled")
-path_to_pose3d = Path("E:/Argos/Processing/Pose3d")
+path_to_data_labelled = Path("H:/Argos/Processing/C3D_labelled")
+path_to_pose3d = Path("H:/Argos/Processing/Pose3d")
+
+path_to_pose3d = Path("E:/code/github/analysis_mmpose/mono_subject_3D")
 folder_data = Path("./Comparaison_3D")
+file_export_c3d = Path("E:/code/github/analysis_mmpose/control_c3d")
 # check if the folder_data exist
 if not folder_data.exists():
     folder_data.mkdir()
 
+filter_data= False
 # Generate 3d_to_2d hdf5 ------------------------------------------------
-study = data_dictionary.CRME_study()
-study = data_dictionary.remove_tasks(study, ["00_","01_","02_","11_"])
-study = data_dictionary.remove_subjects(study, ["Subject_05_TDC","Subject_03_TDC"])
+study = data_dictionary.CRME_study_ISB()
+study = data_dictionary.remove_tasks(study, ["00_S"])
+study = data_dictionary.remove_subjects(study, ["Subject_09_TDC","Subject_10_TDC","Subject_11_TDC"
+                                                    ,"Subject_09_CP","Subject_10_CP"])
 
 sujet_to_list_task = study["task"]
 subjects_names = list(study["task"].keys())
@@ -69,8 +74,8 @@ temp_camera_configurations = combinaison_camera.generate()
 camera_configurations = dict()
 camera_configurations["ABCDE"] = temp_camera_configurations["ABCDE"]
 # Comparaison with data form mmpose ------------------------------------------------
-list_model = ["all_body_hrnet_coco_dark_coco_hdf5","all_body_resnet_hdf5","all_body_rtm_coktail_14_hdf5"]
-list_model = ["all_body_rtm_coktail_14_hdf5"]
+list_model = ["all_body_hrnet_coco_dark_coco_hdf5","all_body_rtm_coktail_14_hdf5","all_body_resnet_hdf5"]
+#list_model = ["all_body_rtm_coktail_14_hdf5"]
 
 # keypoints = reduce_whole_body_coco_keypoints()
 # keypoints = {value: key for key, value in keypoints.items()}
@@ -114,6 +119,7 @@ for name_config, list_camera in camera_configurations.items():
                 points_data_ref, points_name_ref, points_ind_ref = snipC3D.get_points_ezc3d(c3d_ref)
                 points_data_ML, points_name_ML, points_ind_ML = snipC3D.get_points_ezc3d(c3d_ML)
                 dict_distance = dict()
+                dict_to_add_c3d = dict()
                 dict_percentage_nan = dict()
                 fq_video = subject_to_fq_file_video[subject]
                 for name_point_ref,name_point_ML in points_to_compare.items():
@@ -124,9 +130,11 @@ for name_config, list_camera in camera_configurations.items():
 
                     ML = points_data_ML[:, points_ind_ML[name_point_ML], :]
                     ML = transform_zeros_to_nan(ML)
-                    #ML = butter_lowpass_filter(points_data_ML[:,points_ind_ML[name_point_ML],:],5, fq_video, order=4)
+                    if filter_data:
+                        ML = butter_lowpass_filter(points_data_ML[:,points_ind_ML[name_point_ML],:],5, fq_video, order=4)
+                    
                     ML_orient  = reorient_marker_less(ML)
-
+                    
                     # define the smaller array
                     if ref.shape[1] < ML_orient.shape[1]:
                         ML_orient = ML_orient[:,:ref.shape[1]]
@@ -142,6 +150,8 @@ for name_config, list_camera in camera_configurations.items():
                     # calculate the percentage of Nan
                     dict_percentage_nan[name_point_ref] = calculate_percentage_nan(ML_orient)
 
+                    dict_to_add_c3d[name_point_ref + "_ref"] = ref
+                    dict_to_add_c3d[name_point_ML] = ML_orient
 
 
                 ref_LHM = points_data_ref[:, points_ind_ref["L_HMJC"], ::int(fq_file_c3d / fq_video)]
@@ -157,12 +167,13 @@ for name_config, list_camera in camera_configurations.items():
                 ML_LHM5 = transform_zeros_to_nan(ML_LHM5)
 
                 # filter all point
-                # ref_LHM = butter_lowpass_filter(ref_LHM, 5, fq_file_c3d, order=4)
-                # ref_RHM = butter_lowpass_filter(ref_RHM, 5, fq_file_c3d, order=4)
-                # ML_RHM2 = butter_lowpass_filter(ML_RHM2, 5, fq_video, order=4)
-                # ML_RHM5 = butter_lowpass_filter(ML_RHM5, 5, fq_video, order=4)
-                # ML_LHM2 = butter_lowpass_filter(ML_LHM2, 5, fq_video, order=4)
-                # ML_LHM5 = butter_lowpass_filter(ML_LHM5, 5, fq_video, order=4)
+                if filter_data:
+                    ref_LHM = butter_lowpass_filter(ref_LHM, 5, fq_file_c3d, order=4)
+                    ref_RHM = butter_lowpass_filter(ref_RHM, 5, fq_file_c3d, order=4)
+                    ML_RHM2 = butter_lowpass_filter(ML_RHM2, 5, fq_video, order=4)
+                    ML_RHM5 = butter_lowpass_filter(ML_RHM5, 5, fq_video, order=4)
+                    ML_LHM2 = butter_lowpass_filter(ML_LHM2, 5, fq_video, order=4)
+                    ML_LHM5 = butter_lowpass_filter(ML_LHM5, 5, fq_video, order=4)
 
                 ML_RHM = (ML_RHM2 + ML_RHM5) / 2
                 ML_LHM = (ML_LHM2 + ML_LHM5) / 2
@@ -191,6 +202,18 @@ for name_config, list_camera in camera_configurations.items():
                 dict_data[name_config][model][subject][task] = dict_distance
                 dict_data_percentage[name_config][model][subject][task] = dict_percentage_nan
 
+                
+                dict_to_add_c3d["R_HMJC_ref"] = ref_RHM
+                dict_to_add_c3d["R_HMJC"] =  reorient_marker_less(ML_RHM)
+                dict_to_add_c3d["L_HMJC_ref"] = ref_LHM
+                dict_to_add_c3d["L_HMJC"] = reorient_marker_less(ML_LHM)
+                
+
+                filename_folder = file_export_c3d  / model / subject
+                if not filename_folder.exists():
+                    filename_folder.mkdir(parents=True, exist_ok=True)
+                filename = str(filename_folder/ f"{task}.c3d")
+                snipC3D.create_c3d_from_dictionary(filename,dict_to_add_c3d,60,"m")
 
 
 list_points = [["L_SJC","R_SJC"],["L_EJC","R_EJC"],["L_WJC","R_WJC"],["L_HMJC","R_HMJC"]]
@@ -229,6 +252,11 @@ for name_config, list_camera in camera_configurations.items():
                             dict_final[name_config][model][points_name]["Z"] = np.append(dict_final[name_config][model][points_name]["Z"], dict_data[name_config][model][subject][task][point]["Z"])
 
             dict_final_percentage[name_config][model][points_name] = np.mean(percentage)
+# Change file name if filter
+if filter_data: 
+    folder_data = folder_data / "filter_5Hz"
+    if not folder_data.exists():
+        folder_data.mkdir()
 # save the dict_final
 snipH5.save_dictionary_to_hdf(dict_final, folder_data / "comparaison_final_3d.h5")
 # save the dict_data_percentage

@@ -39,18 +39,31 @@ def butter_lowpass_filter(data, cutoff, fs, order=4):
     y = filtfilt(b, a, data, axis=1)
     return y
 
-path_to_data_labelled = Path("E:/Argos/Processing/C3D_labelled")
-path_to_pose3d = Path("E:/Argos/Processing/Pose3d")
+path_to_data_labelled = Path("H:/Argos/Processing/C3D_labelled")
+path_to_pose3d = Path("H:/Argos/Processing/Pose3d")
+path_to_pose3d = Path("E:/code/github/analysis_mmpose/mono_subject_3D")
 folder_data = Path("./Comparaison_3D")
 # check if the folder_data exist
 if not folder_data.exists():
     folder_data.mkdir()
 
-# Generate 3d_to_2d hdf5 ------------------------------------------------
-study = data_dictionary.CRME_study()
-study = data_dictionary.remove_tasks(study, ["00_","01_","02_","11_"])
-study = data_dictionary.remove_subjects(study, ["Subject_05_TDC","Subject_03_TDC"])
+# Option 
+filter_data = False
+if filter_data:
+    folder_data = folder_data / "filter_5Hz"
+    if not folder_data.exists():
+        folder_data.mkdir()
 
+# Generate 3d_to_2d hdf5 ------------------------------------------------
+study = data_dictionary.CRME_study_ISB()
+study = data_dictionary.remove_tasks(study, ["00_S"])
+study = data_dictionary.remove_subjects(study, ["Subject_05_CP","Subject_04_TDC","Subject_06_TDC","Subject_07_TDC",
+                                                "Subject_08_TDC","Subject_06_CP","Subject_07_CP","Subject_08_CP",
+                                                "Subject_09_TDC","Subject_10_TDC","Subject_11_TDC","Subject_09_CP","Subject_10_CP"])
+#study = data_dictionary.remove_subjects(study, ["Subject_04_TDC","Subject_05_TDC","Subject_02_CP","Subject_05_CP","Subject_06_TDC","Subject_07_TDC","Subject_08_TDC"
+#                                                    ,"Subject_06_CP","Subject_07_CP","Subject_08_CP",])
+#study = data_dictionary.remove_subjects(study, ["Subject_01_CP","Subject_09_TDC","Subject_10_TDC","Subject_11_TDC"
+#                                                    ,"Subject_09_CP","Subject_10_CP"])
 sujet_to_list_task = study["task"]
 subjects_names = list(study["task"].keys())
 fq_file_c3d = 120
@@ -70,7 +83,7 @@ camera_configurations = dict()
 camera_configurations["ABCDE"] = temp_camera_configurations["ABCDE"]
 # Comparaison with data form mmpose ------------------------------------------------
 list_model = ["all_body_hrnet_coco_dark_coco_hdf5","all_body_resnet_hdf5","all_body_rtm_coktail_14_hdf5"]
-list_model = ["all_body_rtm_coktail_14_hdf5"]
+#list_model = ["all_body_rtm_coktail_14_hdf5"]
 
 # keypoints = reduce_whole_body_coco_keypoints()
 # keypoints = {value: key for key, value in keypoints.items()}
@@ -117,16 +130,34 @@ for name_config, list_camera in camera_configurations.items():
                 dict_percentage_nan = dict()
                 fq_video = subject_to_fq_file_video[subject]
                 for name_point_ref,name_point_ML in points_to_compare.items():
-                    ref = points_data_ref[:, points_ind_ref[name_point_ref], ::int(fq_file_c3d/fq_video)]
+                    size_ref = points_data_ref.shape[2]
+                    size_ML = points_data_ML.shape[2]
+                    step = round(size_ref / size_ML)
+                    if step not in (1,2):
+                        print(subject)
+                        print(task)
+                        raise ValueError("The step is not 1 or 2")
+                    #ref = points_data_ref[:, points_ind_ref[name_point_ref], ::int(fq_file_c3d/fq_video)]
+                    ref = points_data_ref[:, points_ind_ref[name_point_ref], ::step]
                     # let s filter the point ML with a 5Hz filter butterwotrt
-                    #ref = butter_lowpass_filter(ref, 5, fq_file_c3d, order=4)
+                    if filter_data:
+                        ref = butter_lowpass_filter(ref, 5, fq_file_c3d, order=4)
 
                     ML = points_data_ML[:, points_ind_ML[name_point_ML], :]
                     ML = transform_zeros_to_nan(ML)
-                    #ML = butter_lowpass_filter(points_data_ML[:,points_ind_ML[name_point_ML],:],5, fq_video, order=4)
+                    if filter_data:
+                        ML = butter_lowpass_filter(points_data_ML[:,points_ind_ML[name_point_ML],:],5, fq_video, order=4)
                     ML_orient  = reorient_marker_less(ML)
 
                     # define the smaller array
+                    if abs(ref.shape[1] - ML_orient.shape[1]) > 10:
+                        print("The two array are not the same size")
+                        print(subject)
+                        print(task)
+                        print("ref shape",ref.shape[1])
+                        print("ML shape",ML_orient.shape[1])
+                        print("toto")
+
                     if ref.shape[1] < ML_orient.shape[1]:
                         ML_orient = ML_orient[:,:ref.shape[1]]
                     else:
@@ -135,8 +166,10 @@ for name_config, list_camera in camera_configurations.items():
                     dict_distance[name_point_ref] = np.linalg.norm(ref - ML_orient,axis=0)
                     # calculate the percentage of Nan
                     dict_percentage_nan[name_point_ref] = calculate_percentage_nan(ML_orient)
-                ref_LHM = points_data_ref[:, points_ind_ref["L_HMJC"], ::int(fq_file_c3d / fq_video)]
-                ref_RHM = points_data_ref[:, points_ind_ref["R_HMJC"], ::int(fq_file_c3d / fq_video)]
+                #ref_LHM = points_data_ref[:, points_ind_ref["L_HMJC"], ::int(fq_file_c3d / fq_video)]
+                #ref_RHM = points_data_ref[:, points_ind_ref["R_HMJC"], ::int(fq_file_c3d / fq_video)]
+                ref_LHM = points_data_ref[:, points_ind_ref["L_HMJC"], ::step]
+                ref_RHM = points_data_ref[:, points_ind_ref["R_HMJC"], ::step]
                 ML_RHM2 = points_data_ML[:, points_ind_ML["R_MCP_index"], :]
                 ML_RHM5 = points_data_ML[:, points_ind_ML["R_MCP_little"], :]
                 ML_LHM2 = points_data_ML[:, points_ind_ML["L_MCP_index"], :]
@@ -148,12 +181,13 @@ for name_config, list_camera in camera_configurations.items():
                 ML_LHM5 = transform_zeros_to_nan(ML_LHM5)
 
                 # filter all point
-                # ref_LHM = butter_lowpass_filter(ref_LHM, 5, fq_file_c3d, order=4)
-                # ref_RHM = butter_lowpass_filter(ref_RHM, 5, fq_file_c3d, order=4)
-                # ML_RHM2 = butter_lowpass_filter(ML_RHM2, 5, fq_video, order=4)
-                # ML_RHM5 = butter_lowpass_filter(ML_RHM5, 5, fq_video, order=4)
-                # ML_LHM2 = butter_lowpass_filter(ML_LHM2, 5, fq_video, order=4)
-                # ML_LHM5 = butter_lowpass_filter(ML_LHM5, 5, fq_video, order=4)
+                if filter_data:
+                    ref_LHM = butter_lowpass_filter(ref_LHM, 5, fq_file_c3d, order=4)
+                    ref_RHM = butter_lowpass_filter(ref_RHM, 5, fq_file_c3d, order=4)
+                    ML_RHM2 = butter_lowpass_filter(ML_RHM2, 5, fq_video, order=4)
+                    ML_RHM5 = butter_lowpass_filter(ML_RHM5, 5, fq_video, order=4)
+                    ML_LHM2 = butter_lowpass_filter(ML_LHM2, 5, fq_video, order=4)
+                    ML_LHM5 = butter_lowpass_filter(ML_LHM5, 5, fq_video, order=4)
 
                 ML_RHM = (ML_RHM2 + ML_RHM5) / 2
                 ML_LHM = (ML_LHM2 + ML_LHM5) / 2
@@ -176,27 +210,36 @@ list_points = [["L_SJC","R_SJC"],["L_EJC","R_EJC"],["L_WJC","R_WJC"],["L_HMJC","
 key_points = ["SJC","EJC","WJC","HMJC"]
 
 dict_comp_population = dict()
-
+dict_data_remove = dict()
 for name_config, list_camera in camera_configurations.items():
     dict_comp_population[name_config]=dict()
+    dict_data_remove[name_config] = dict()
     for model in list_model:
         dict_comp_population[name_config][model]  = dict()
+        dict_data_remove[name_config][model] = list()
+        # Intialize the dict for each point
+        for subject in subjects_names:
+            for task in sujet_to_list_task[subject]:
+                if "_000" in task or "_001" in task:
+                    task_name = task.replace("_000", "").replace("_001", "")
+                else:
+                    task_name = task 
+                # test if dict_comp_population[name_config][model][task_name] has already been defined as a dictionary
+                if task_name not in dict_comp_population[name_config][model]:
+                    dict_comp_population[name_config][model][task_name] = dict()
+                dict_comp_population[name_config][model][task_name]["CP"] = dict()
+                dict_comp_population[name_config][model][task_name]["TDC"] = dict()
+                dict_comp_population[name_config][model][task_name][subject] = dict()
+            # fusion of all the task for each population
+            if "All" not in dict_comp_population[name_config][model]:
+                dict_comp_population[name_config][model]["All"] = dict()
+            dict_comp_population[name_config][model]["All"]["CP"] = dict()
+            dict_comp_population[name_config][model]["All"]["TDC"] = dict() 
+            dict_comp_population[name_config][model]["All"][subject] = dict()       
+        
         for ind_points,points in enumerate(list_points):
             points_name = key_points[ind_points]  #           
-            for point in points:
-                # Intialize the dict for each point
-                for subject in subjects_names:
-                    for task in sujet_to_list_task[subject]:
-                        if "_000" in task or "_001" in task:
-                            task_name = task.replace("_000", "").replace("_001", "")
-                        else:
-                            task_name = task 
-                        dict_comp_population[name_config][model][task_name] = dict()
-                        dict_comp_population[name_config][model][task_name]["CP"] = dict()
-                        dict_comp_population[name_config][model][task_name]["TDC"] = dict()
-
-                    
-
+            for point in points:                    
                 for subject in subjects_names:
                     if "TDC" in subject:
                         population = "TDC"
@@ -204,6 +247,7 @@ for name_config, list_camera in camera_configurations.items():
                         population = "CP"
                     else:
                         raise ValueError("subject not in TDC or CP")
+
                     for task in sujet_to_list_task[subject]:
                         if "_000" in task or "_001" in task:
                             task_name = task.replace("_000", "").replace("_001", "")
@@ -213,8 +257,27 @@ for name_config, list_camera in camera_configurations.items():
                         if points_name not in dict_comp_population[name_config][model][task_name][population]:
                             dict_comp_population[name_config][model][task_name][population][points_name] = dict_data[name_config][model][subject][task][point]
                         else:
-                            dict_comp_population[name_config][model][task_name][population][points_name] = np.append(dict_comp_population[name_config][model] [points_name], dict_data[name_config][model][subject][task][point])
+                            dict_comp_population[name_config][model][task_name][population][points_name] = np.append(dict_comp_population[name_config][model][task_name][population][points_name], dict_data[name_config][model][subject][task][point])
+                        # fusion of all the task for each population
+                        if points_name not in dict_comp_population[name_config][model]["All"][population]:
+                            # Check if the median error is below 0.1
+                            if np.nanmedian(dict_data[name_config][model][subject][task][point]) < 0.1:
+                                dict_comp_population[name_config][model]["All"][population][points_name] = dict_data[name_config][model][subject][task][point]
+                            else:
+                                dict_data_remove[name_config][model].append([model, subject, task, point]) 
+                        else:
+                            if np.nanmedian(dict_data[name_config][model][subject][task][point]) < 0.1:
+                                dict_comp_population[name_config][model]["All"][population][points_name] = np.append(dict_comp_population[name_config][model]["All"][population][points_name], dict_data[name_config][model][subject][task][point])
+                            else:
+                                dict_data_remove[name_config][model].append([model, subject, task, point])
+                        
+                        # By subject 
+                        if points_name not in dict_comp_population[name_config][model][task_name][subject]:
+                            dict_comp_population[name_config][model][task_name][subject][points_name] = dict_data[name_config][model][subject][task][point]
+                        else:
+                            dict_comp_population[name_config][model][task_name][subject][points_name] = np.append(dict_comp_population[name_config][model][task_name][subject][points_name], dict_data[name_config][model][subject][task][point])
 
+snipH5.save_dictionary_to_hdf(dict_comp_population, folder_data / "comparaison_population_3d.h5")
 
 dict_final = dict()
 dict_final_percentage = dict()
