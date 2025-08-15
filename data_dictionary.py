@@ -13,14 +13,28 @@ def S2M_study():
                 "Sujet_012": ["01-eat-yaourt", "02-cut-food"],
                 "Sujet_013": ["01-eat-yaourt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair","17-hand-to-back"],
                 "Sujet_014": ["01-eat-yaourt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair","17-hand-to-back"],
-                "fake_008": ["extrinsics"],
+                "Sujet_015": ["01-eat-yaourt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair","17-hand-to-back"],
+                "Sujet_016": ["01-eat-yaourt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair","17-hand-to-back"],
+                "Sujet_017": ["01-eat-yaourt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair","17-hand-to-back"],
+                "Sujet_018": ["01-eat-yaourt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair","17-hand-to-back"],
+                "Sujet_019": ["01-eat-yaourt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair","17-hand-to-back"],
+                "Sujet_020": ["01-eat-yaourt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair","17-hand-to-back"],
+                "Sujet_021": ["01-eat-yaourt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair","17-hand-to-back"],
+                "Sujet_022": ["01-eat-yaourt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair","17-hand-to-back"],
+                "Sujet_023": ["01-eat-yaourt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair","17-hand-to-back"],
+                "Sujet_024": ["01-eat-yaourt", "02-cut-food", "13-playdoe", "06-drawing", "16-comb-hair","17-hand-to-back"],
                 }
         subject_to_fq_file_video = {"Sujet_000": 120, "Sujet_001": 60,
                                     "Sujet_002": 60, "Sujet_003": 60,
                                     "Sujet_007": 60, "Sujet_008": 60,
                                     "Sujet_009": 60, "Sujet_010": 60,
                                     "Sujet_011": 60, "Sujet_012": 60,
-                                    "Sujet_013": 60, "Sujet_014": 60}
+                                    "Sujet_013": 60, "Sujet_014": 60,
+                                    "Sujet_015": 60, "Sujet_016": 60,
+                                    "Sujet_017": 60, "Sujet_018": 60,
+                                    "Sujet_019": 60, "Sujet_020": 60,
+                                    "Sujet_021": 60, "Sujet_022": 60,
+                                    "Sujet_023": 60, "Sujet_024": 60}
         study = dict()
         study["task"] = sujet_to_list_task
         study["fq_video"] = subject_to_fq_file_video
